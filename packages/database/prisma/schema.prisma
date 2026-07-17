@@ -66,6 +66,23 @@ enum EvidenceDirection {
   challenges
 }
 
+enum CorrectionStatus {
+  pending
+  applied
+  rejected
+}
+
+enum MemoryTimelineEventType {
+  record_created
+  record_updated
+  lifecycle_transitioned
+  evidence_added
+  correction_requested
+  correction_applied
+  correction_rejected
+  confidence_recalculated
+}
+
 enum ConfidenceBand {
   low
   moderate
@@ -356,6 +373,8 @@ model MemoryRecord {
   claim              String
   owner              String?
   reasoning          String?
+  provenance         Json                       @default("{}")
+  version            Int                        @default(1)
   confidenceScore    Int                        @map("confidence_score")
   confidenceBand     ConfidenceBand             @map("confidence_band")
   confidenceMethod   String                     @map("confidence_method")
@@ -368,6 +387,8 @@ model MemoryRecord {
   updatedAt          DateTime                   @updatedAt @map("updated_at") @db.Timestamptz(6)
   evidenceItems      EvidenceItem[]
   corrections        Correction[]
+  versions           MemoryRecordVersion[]
+  timelineEvents     MemoryTimelineEvent[]
 
   @@index([organizationId, lifecycle, classification])
   @@map("memory_records")
@@ -384,11 +405,15 @@ model EvidenceItem {
   direction       EvidenceDirection @default(supports)
   observedAt      DateTime          @map("observed_at") @db.Timestamptz(6)
   metadata        Json
+  provenance      Json              @default("{}")
+  version         Int               @default(1)
   embedding       Unsupported("vector(1536)")?
   createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   memoryRecord    MemoryRecord?     @relation(fields: [memoryRecordId], references: [id], onDelete: Restrict)
+  versions        EvidenceItemVersion[]
 
   @@index([organizationId, sourceType, observedAt])
+  @@index([organizationId, memoryRecordId, observedAt])
   @@map("evidence_items")
 }
 
@@ -398,11 +423,87 @@ model Correction {
   memoryRecordId  String       @map("memory_record_id") @db.Uuid
   actorId         String       @map("actor_id") @db.Uuid
   rationale       String
+  status          CorrectionStatus @default(pending)
+  proposedClaim   String?      @map("proposed_claim")
+  proposedLifecycle MemoryLifecycle? @map("proposed_lifecycle")
+  proposedConfidenceScore Int? @map("proposed_confidence_score")
+  provenance      Json        @default("{}")
+  version         Int         @default(1)
+  reviewedByUserId String?    @map("reviewed_by_user_id") @db.Uuid
+  reviewRationale String?     @map("review_rationale")
+  appliedAt       DateTime?   @map("applied_at") @db.Timestamptz(6)
+  rejectedAt      DateTime?   @map("rejected_at") @db.Timestamptz(6)
   createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
   memoryRecord    MemoryRecord @relation(fields: [memoryRecordId], references: [id], onDelete: Restrict)
+  versions        CorrectionVersion[]
 
-  @@index([organizationId, memoryRecordId, createdAt])
+  @@index([organizationId, memoryRecordId, status, createdAt])
   @@map("corrections")
+}
+
+model MemoryRecordVersion {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String       @map("organization_id") @db.Uuid
+  memoryRecordId  String       @map("memory_record_id") @db.Uuid
+  version         Int
+  snapshot        Json
+  changedByUserId String?      @map("changed_by_user_id") @db.Uuid
+  changeReason    String       @map("change_reason")
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  memoryRecord    MemoryRecord @relation(fields: [memoryRecordId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, memoryRecordId, version])
+  @@index([organizationId, memoryRecordId, createdAt])
+  @@map("memory_record_versions")
+}
+
+model EvidenceItemVersion {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String       @map("organization_id") @db.Uuid
+  evidenceItemId  String       @map("evidence_item_id") @db.Uuid
+  version         Int
+  snapshot        Json
+  changedByUserId String?      @map("changed_by_user_id") @db.Uuid
+  changeReason    String       @map("change_reason")
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  evidenceItem    EvidenceItem @relation(fields: [evidenceItemId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, evidenceItemId, version])
+  @@index([organizationId, evidenceItemId, createdAt])
+  @@map("evidence_item_versions")
+}
+
+model CorrectionVersion {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String       @map("organization_id") @db.Uuid
+  correctionId    String       @map("correction_id") @db.Uuid
+  version         Int
+  snapshot        Json
+  changedByUserId String?      @map("changed_by_user_id") @db.Uuid
+  changeReason    String       @map("change_reason")
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  correction      Correction   @relation(fields: [correctionId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, correctionId, version])
+  @@index([organizationId, correctionId, createdAt])
+  @@map("correction_versions")
+}
+
+model MemoryTimelineEvent {
+  id              String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String                  @map("organization_id") @db.Uuid
+  memoryRecordId  String                  @map("memory_record_id") @db.Uuid
+  eventType       MemoryTimelineEventType @map("event_type")
+  actorId         String?                 @map("actor_id") @db.Uuid
+  eventVersion    Int                     @map("event_version")
+  payload         Json
+  occurredAt      DateTime                @default(now()) @map("occurred_at") @db.Timestamptz(6)
+  memoryRecord    MemoryRecord            @relation(fields: [memoryRecordId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, memoryRecordId, occurredAt])
+  @@index([organizationId, eventType, occurredAt])
+  @@map("memory_timeline_events")
 }
 
 model Insight {

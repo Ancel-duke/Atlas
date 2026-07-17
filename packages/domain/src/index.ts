@@ -25,6 +25,10 @@ export const organizationPermissions = [
   "graph:read",
   "graph:write",
   "graph:project",
+  "memory:read",
+  "memory:write",
+  "memory:evidence",
+  "memory:correct",
   "repository:read",
   "repository:write",
   "pulse:read",
@@ -46,6 +50,10 @@ const rolePermissions = {
     "graph:read",
     "graph:write",
     "graph:project",
+    "memory:read",
+    "memory:write",
+    "memory:evidence",
+    "memory:correct",
     "repository:read",
     "repository:write",
     "pulse:read",
@@ -58,11 +66,22 @@ const rolePermissions = {
     "graph:read",
     "graph:write",
     "graph:project",
+    "memory:read",
+    "memory:write",
+    "memory:evidence",
+    "memory:correct",
     "repository:read",
     "repository:write",
     "pulse:read"
   ],
-  viewer: ["organization:read", "membership:read", "graph:read", "repository:read", "pulse:read"]
+  viewer: [
+    "organization:read",
+    "membership:read",
+    "graph:read",
+    "memory:read",
+    "repository:read",
+    "pulse:read"
+  ]
 } as const satisfies Record<OrganizationRole, readonly OrganizationPermission[]>;
 
 export function permissionsForRole(role: OrganizationRole): readonly OrganizationPermission[] {
@@ -92,6 +111,35 @@ export function confidenceBandForScore(score: number): ConfidenceBand {
   }
 
   return "low";
+}
+
+export type MemoryLifecycle =
+  "proposed" | "verified" | "active" | "challenged" | "superseded" | "deprecated" | "archived";
+
+const allowedMemoryLifecycleTransitions: Record<MemoryLifecycle, readonly MemoryLifecycle[]> = {
+  proposed: ["verified", "active", "challenged", "deprecated", "archived"],
+  verified: ["active", "challenged", "deprecated", "archived"],
+  active: ["challenged", "superseded", "deprecated", "archived"],
+  challenged: ["active", "superseded", "deprecated", "archived"],
+  superseded: ["archived"],
+  deprecated: ["archived"],
+  archived: []
+} as const satisfies Record<MemoryLifecycle, readonly MemoryLifecycle[]>;
+
+export function canTransitionMemoryLifecycle(
+  current: MemoryLifecycle,
+  next: MemoryLifecycle
+): boolean {
+  return allowedMemoryLifecycleTransitions[current].includes(next);
+}
+
+export function assertMemoryLifecycleTransition(
+  current: MemoryLifecycle,
+  next: MemoryLifecycle
+): void {
+  if (!canTransitionMemoryLifecycle(current, next)) {
+    throw new Error(`Invalid memory lifecycle transition from ${current} to ${next}.`);
+  }
 }
 
 export type PulseDimensionScore = {

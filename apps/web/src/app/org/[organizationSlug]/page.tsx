@@ -120,6 +120,9 @@ export default async function OrganizationPage(props: OrganizationPageProps): Pr
               <Link href={`/org/${organizationSlug}/settings/members`}>Manage members</Link>
             </Button>
             <Button asChild variant="secondary">
+              <Link href={`/org/${organizationSlug}/memory`}>Engineering Memory</Link>
+            </Button>
+            <Button asChild variant="secondary">
               <Link href={`/org/${organizationSlug}/repositories/local/pulse`}>
                 Open Pulse route
               </Link>

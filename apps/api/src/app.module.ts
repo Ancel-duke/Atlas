@@ -6,6 +6,7 @@ import { parseServerEnvironment } from "@atlas/config";
 import { queueNames } from "@atlas/contracts";
 
 import { AtlasMemoryGraphModule } from "./capabilities/atlas-memory-graph/atlas-memory-graph.module.js";
+import { EngineeringMemoryModule } from "./capabilities/engineering-memory/engineering-memory.module.js";
 import { IdentityModule } from "./capabilities/identity/identity.module.js";
 import { JwtAuthGuard } from "./capabilities/identity/presentation/jwt-auth.guard.js";
 import { SystemModule } from "./capabilities/system/system.module.js";
@@ -21,6 +22,7 @@ const environment = parseServerEnvironment(process.env);
     }),
     BullModule.registerQueue({ name: queueNames.repositoryIngestion }),
     AtlasMemoryGraphModule,
+    EngineeringMemoryModule,
     IdentityModule,
     SystemModule
   ],

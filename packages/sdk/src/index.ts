@@ -1,6 +1,8 @@
 import {
   authTokenResponseSchema,
   createInvitationResponseSchema,
+  correctionSchema,
+  evidenceItemSchema,
   foundationStatusSchema,
   graphEntitySchema,
   graphProjectionSchema,
@@ -9,6 +11,9 @@ import {
   graphVersionSchema,
   healthResponseSchema,
   invitationSchema,
+  memoryRecordSchema,
+  memoryTimelineEventSchema,
+  memoryVersionSchema,
   membershipSchema,
   organizationSummarySchema,
   problemDetailsSchema,
@@ -16,7 +21,12 @@ import {
   type AuthTokenResponse,
   type CreateInvitationRequest,
   type CreateInvitationResponse,
+  type CreateCorrectionRequest,
+  type CreateEvidenceItemRequest,
+  type CreateMemoryRecordRequest,
   type CreateOrganizationRequest,
+  type Correction,
+  type EvidenceItem,
   type FoundationStatus,
   type GraphEntity,
   type GraphProjection,
@@ -26,10 +36,16 @@ import {
   type GraphVersion,
   type HealthResponse,
   type Invitation,
+  type MemoryRecord,
+  type MemoryTimelineEvent,
+  type MemoryVersion,
   type Membership,
   type OrganizationSummary,
   type ProblemDetails,
   type ResolveGraphEntityRequest,
+  type ReviewCorrectionRequest,
+  type TransitionMemoryLifecycleRequest,
+  type UpdateMemoryRecordRequest,
   type UpsertGraphEntityRequest,
   type UpsertGraphProjectionRequest,
   type UpsertGraphRelationshipRequest
@@ -186,6 +202,123 @@ export class AtlasSdk {
   public async listGraphProjections(): Promise<GraphProjection[]> {
     return this.request("/v1/graph/projections", (value) =>
       graphProjectionSchema.array().parse(value)
+    );
+  }
+
+  public async createMemoryRecord(input: CreateMemoryRecordRequest): Promise<MemoryRecord> {
+    return this.request("/v1/memory/records", (value) => memoryRecordSchema.parse(value), {
+      method: "POST",
+      body: input
+    });
+  }
+
+  public async listMemoryRecords(): Promise<MemoryRecord[]> {
+    return this.request("/v1/memory/records", (value) => memoryRecordSchema.array().parse(value));
+  }
+
+  public async getMemoryRecord(memoryRecordId: string): Promise<MemoryRecord> {
+    return this.request(`/v1/memory/records/${memoryRecordId}`, (value) =>
+      memoryRecordSchema.parse(value)
+    );
+  }
+
+  public async updateMemoryRecord(
+    memoryRecordId: string,
+    input: UpdateMemoryRecordRequest
+  ): Promise<MemoryRecord> {
+    return this.request(
+      `/v1/memory/records/${memoryRecordId}`,
+      (value) => memoryRecordSchema.parse(value),
+      {
+        method: "PATCH",
+        body: input
+      }
+    );
+  }
+
+  public async transitionMemoryLifecycle(
+    memoryRecordId: string,
+    input: TransitionMemoryLifecycleRequest
+  ): Promise<MemoryRecord> {
+    return this.request(
+      `/v1/memory/records/${memoryRecordId}/lifecycle`,
+      (value) => memoryRecordSchema.parse(value),
+      {
+        method: "POST",
+        body: input
+      }
+    );
+  }
+
+  public async addMemoryEvidence(
+    memoryRecordId: string,
+    input: CreateEvidenceItemRequest
+  ): Promise<EvidenceItem> {
+    return this.request(
+      `/v1/memory/records/${memoryRecordId}/evidence`,
+      (value) => evidenceItemSchema.parse(value),
+      {
+        method: "POST",
+        body: input
+      }
+    );
+  }
+
+  public async listMemoryEvidence(memoryRecordId: string): Promise<EvidenceItem[]> {
+    return this.request(`/v1/memory/records/${memoryRecordId}/evidence`, (value) =>
+      evidenceItemSchema.array().parse(value)
+    );
+  }
+
+  public async createMemoryCorrection(
+    memoryRecordId: string,
+    input: CreateCorrectionRequest
+  ): Promise<Correction> {
+    return this.request(
+      `/v1/memory/records/${memoryRecordId}/corrections`,
+      (value) => correctionSchema.parse(value),
+      {
+        method: "POST",
+        body: input
+      }
+    );
+  }
+
+  public async listMemoryCorrections(memoryRecordId: string): Promise<Correction[]> {
+    return this.request(`/v1/memory/records/${memoryRecordId}/corrections`, (value) =>
+      correctionSchema.array().parse(value)
+    );
+  }
+
+  public async reviewMemoryCorrection(
+    correctionId: string,
+    input: ReviewCorrectionRequest
+  ): Promise<Correction> {
+    return this.request(
+      `/v1/memory/corrections/${correctionId}/review`,
+      (value) => correctionSchema.parse(value),
+      {
+        method: "POST",
+        body: input
+      }
+    );
+  }
+
+  public async listMemoryRecordVersions(memoryRecordId: string): Promise<MemoryVersion[]> {
+    return this.request(`/v1/memory/records/${memoryRecordId}/versions`, (value) =>
+      memoryVersionSchema.array().parse(value)
+    );
+  }
+
+  public async listMemoryEvidenceVersions(evidenceItemId: string): Promise<MemoryVersion[]> {
+    return this.request(`/v1/memory/evidence/${evidenceItemId}/versions`, (value) =>
+      memoryVersionSchema.array().parse(value)
+    );
+  }
+
+  public async listMemoryTimeline(memoryRecordId: string): Promise<MemoryTimelineEvent[]> {
+    return this.request(`/v1/memory/records/${memoryRecordId}/timeline`, (value) =>
+      memoryTimelineEventSchema.array().parse(value)
     );
   }
 
