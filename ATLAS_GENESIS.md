@@ -61,7 +61,7 @@ Existing tools often fail to understand bounded contexts, whether implementation
 
 ## 6. Atlas
 
-Atlas is a platform built around **Atlas Memory Graph (AMG)**, its Living Engineering Knowledge Graph, and GPT-5.6-backed specialized agents that reason over it. Atlas continuously ingests engineering evidence, resolves it into entities and relationships, records temporal changes, and produces explainable engineering insights. “AMG” is the product name for the durable system of understanding at Atlas’s core; “LEKG” describes its architectural model.
+Atlas is a platform built around **Atlas Memory Graph (AMG)** and GPT-5.6-backed specialized agents that reason over it. Atlas continuously ingests engineering evidence, resolves it into entities and relationships, records temporal changes, and produces explainable engineering insights. Atlas Memory Graph (AMG) is the canonical term for the durable system of understanding at Atlas’s core.
 
 Atlas is not a replacement IDE, a general-purpose chat interface, a linter, an autonomous merge bot, an issue tracker, or an observability vendor. It may integrate with each of these systems. It should improve their usefulness by supplying the architectural and historical context they lack.
 
@@ -84,7 +84,7 @@ The following principles are non-negotiable.
 
 ### Philosophy and model
 
-The **Atlas Memory Graph (AMG)** is Atlas’s canonical representation of engineering reality. Architecturally, AMG is a Living Engineering Knowledge Graph (LEKG): it is not a code-property graph alone, nor a document index with links. It combines deterministic extraction with evidence-backed semantic interpretation and represents relationships as typed, versioned facts.
+The **Atlas Memory Graph (AMG)** is Atlas’s canonical representation of engineering reality. It is not a code-property graph alone, nor a document index with links. It combines deterministic extraction with evidence-backed semantic interpretation and represents relationships as typed, versioned facts.
 
 Every node and edge has stable identity, source provenance, validity interval, ingestion time, confidence, and visibility policy. “Service A calls Service B” is therefore not a timeless sentence; it is a claim supported by code, configuration, traces, or declarations, valid for a definable period and open to revision.
 
@@ -187,7 +187,7 @@ flowchart LR
   C --> D[Parse code and build deterministic code graph]
   D --> E[Extract manifests, IaC, CI, docs, tests]
   E --> F[Resolve entities and cross-repo references]
-  F --> G[Version LEKG facts]
+  F --> G[Version AMG facts]
   G --> H[Run targeted agent reasoning]
   H --> I[Insights, API, UI, notifications]
 ```
