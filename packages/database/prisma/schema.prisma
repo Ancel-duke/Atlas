@@ -1,0 +1,484 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RepositoryProvider {
+  github
+}
+
+enum RepositoryConnectionStatus {
+  connected
+  suspended
+  revoked
+  archived
+}
+
+enum GraphEntityLifecycle {
+  proposed
+  verified
+  active
+  challenged
+  superseded
+  deprecated
+  archived
+}
+
+enum GraphRelationshipStatus {
+  proposed
+  verified
+  active
+  challenged
+  superseded
+  deprecated
+  archived
+}
+
+enum GraphProjectionKind {
+  explorer
+  reasoning
+  impact
+  ownership
+}
+
+enum MemoryRecordClassification {
+  fact
+  decision
+  recommendation
+}
+
+enum MemoryLifecycle {
+  proposed
+  verified
+  active
+  challenged
+  superseded
+  deprecated
+  archived
+}
+
+enum EvidenceDirection {
+  supports
+  challenges
+}
+
+enum ConfidenceBand {
+  low
+  moderate
+  high
+}
+
+enum InsightImpact {
+  low
+  medium
+  high
+  critical
+}
+
+enum InsightStatus {
+  open
+  acknowledged
+  resolved
+  dismissed
+  expired
+}
+
+enum ExternalAccountProvider {
+  github
+}
+
+enum OrganizationRole {
+  owner
+  admin
+  member
+  viewer
+}
+
+enum MembershipStatus {
+  active
+  disabled
+}
+
+enum InvitationStatus {
+  pending
+  accepted
+  revoked
+  expired
+}
+
+model Organization {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug           String          @unique
+  displayName    String          @map("display_name")
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+  memberships    Membership[]
+  invitations    Invitation[]
+  repositories   Repository[]
+  auditEvents    AuditEvent[]
+
+  @@map("organizations")
+}
+
+model User {
+  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email             String            @unique
+  name              String?
+  imageUrl          String?           @map("image_url")
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  externalAccounts  ExternalAccount[]
+  memberships       Membership[]
+  sentInvitations   Invitation[]      @relation("invitation_inviter")
+  acceptedInvitations Invitation[]    @relation("invitation_acceptor")
+  auditEvents       AuditEvent[]
+
+  @@map("users")
+}
+
+model ExternalAccount {
+  id                 String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String                  @map("user_id") @db.Uuid
+  provider           ExternalAccountProvider
+  providerAccountId  String                  @map("provider_account_id")
+  username           String?
+  profileUrl         String?                 @map("profile_url")
+  avatarUrl          String?                 @map("avatar_url")
+  createdAt          DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime                @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user               User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("external_accounts")
+}
+
+model Membership {
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String           @map("organization_id") @db.Uuid
+  userId          String           @map("user_id") @db.Uuid
+  role            OrganizationRole
+  status          MembershipStatus @default(active)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId, status])
+  @@index([organizationId, role, status])
+  @@map("memberships")
+}
+
+model Invitation {
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId    String           @map("organization_id") @db.Uuid
+  email             String
+  role              OrganizationRole
+  tokenHash         String           @unique @map("token_hash")
+  status            InvitationStatus @default(pending)
+  invitedByUserId   String           @map("invited_by_user_id") @db.Uuid
+  acceptedByUserId  String?          @map("accepted_by_user_id") @db.Uuid
+  expiresAt         DateTime         @map("expires_at") @db.Timestamptz(6)
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  organization      Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedByUser     User             @relation("invitation_inviter", fields: [invitedByUserId], references: [id], onDelete: Restrict)
+  acceptedByUser    User?            @relation("invitation_acceptor", fields: [acceptedByUserId], references: [id], onDelete: Restrict)
+
+  @@unique([organizationId, email, status])
+  @@index([organizationId, status, expiresAt])
+  @@map("invitations")
+}
+
+model Repository {
+  id                    String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId        String                     @map("organization_id") @db.Uuid
+  provider              RepositoryProvider
+  providerRepositoryId  String                     @map("provider_repository_id")
+  name                  String
+  defaultBranch         String                     @map("default_branch")
+  connectionStatus      RepositoryConnectionStatus @default(connected) @map("connection_status")
+  createdAt             DateTime                   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime                   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  organization          Organization               @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  snapshots             RepositorySnapshot[]
+  pulseAssessments      PulseAssessment[]
+
+  @@unique([organizationId, provider, providerRepositoryId])
+  @@index([organizationId, connectionStatus])
+  @@map("repositories")
+}
+
+model RepositorySnapshot {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String     @map("organization_id") @db.Uuid
+  repositoryId    String     @map("repository_id") @db.Uuid
+  commitSha       String     @map("commit_sha")
+  sourceRevision  String     @map("source_revision")
+  acquiredAt      DateTime   @default(now()) @map("acquired_at") @db.Timestamptz(6)
+  provenance      Json
+  repository      Repository @relation(fields: [repositoryId], references: [id], onDelete: Restrict)
+
+  @@unique([organizationId, repositoryId, commitSha])
+  @@index([organizationId, repositoryId, acquiredAt])
+  @@map("repository_snapshots")
+}
+
+model GraphEntity {
+  id              String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String                 @map("organization_id") @db.Uuid
+  entityType      String                 @map("entity_type")
+  canonicalKey    String                 @map("canonical_key")
+  displayName     String?                @map("display_name")
+  attributes      Json                   @default("{}")
+  sourceScope     Json                   @map("source_scope")
+  provenance      Json                   @default("{}")
+  lifecycle       GraphEntityLifecycle   @default(proposed)
+  version         Int                    @default(1)
+  confidenceScore Int                    @map("confidence_score")
+  confidenceBand  ConfidenceBand         @map("confidence_band")
+  validFrom       DateTime?              @map("valid_from") @db.Timestamptz(6)
+  validUntil      DateTime?              @map("valid_until") @db.Timestamptz(6)
+  createdAt       DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+  outgoing        GraphRelationship[]    @relation("relationship_source")
+  incoming        GraphRelationship[]    @relation("relationship_target")
+  aliases         GraphEntityAlias[]
+  versions        GraphEntityVersion[]
+
+  @@unique([organizationId, entityType, canonicalKey])
+  @@index([organizationId, lifecycle, entityType])
+  @@map("graph_entities")
+}
+
+model GraphEntityAlias {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String      @map("organization_id") @db.Uuid
+  entityId        String      @map("entity_id") @db.Uuid
+  entityType      String      @map("entity_type")
+  aliasKey        String      @map("alias_key")
+  provenance      Json        @default("{}")
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  entity          GraphEntity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, entityType, aliasKey])
+  @@index([organizationId, entityId])
+  @@map("graph_entity_aliases")
+}
+
+model GraphEntityVersion {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String      @map("organization_id") @db.Uuid
+  entityId        String      @map("entity_id") @db.Uuid
+  version         Int
+  snapshot        Json
+  changedByUserId String?     @map("changed_by_user_id") @db.Uuid
+  changeReason    String      @map("change_reason")
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  entity          GraphEntity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, entityId, version])
+  @@index([organizationId, entityId, createdAt])
+  @@map("graph_entity_versions")
+}
+
+model GraphRelationship {
+  id              String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String                  @map("organization_id") @db.Uuid
+  sourceEntityId  String                  @map("source_entity_id") @db.Uuid
+  targetEntityId  String                  @map("target_entity_id") @db.Uuid
+  relationship    String
+  status          GraphRelationshipStatus @default(proposed)
+  provenance      Json
+  attributes      Json                    @default("{}")
+  version         Int                     @default(1)
+  confidenceScore Int                     @map("confidence_score")
+  confidenceBand  ConfidenceBand          @map("confidence_band")
+  validFrom       DateTime?               @map("valid_from") @db.Timestamptz(6)
+  validUntil      DateTime?               @map("valid_until") @db.Timestamptz(6)
+  createdAt       DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime                @updatedAt @map("updated_at") @db.Timestamptz(6)
+  sourceEntity    GraphEntity             @relation("relationship_source", fields: [sourceEntityId], references: [id], onDelete: Restrict)
+  targetEntity    GraphEntity             @relation("relationship_target", fields: [targetEntityId], references: [id], onDelete: Restrict)
+  versions        GraphRelationshipVersion[]
+
+  @@unique([organizationId, sourceEntityId, targetEntityId, relationship])
+  @@index([organizationId, sourceEntityId, relationship])
+  @@index([organizationId, targetEntityId, relationship])
+  @@map("graph_relationships")
+}
+
+model GraphRelationshipVersion {
+  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId    String            @map("organization_id") @db.Uuid
+  relationshipId    String            @map("relationship_id") @db.Uuid
+  version           Int
+  snapshot          Json
+  changedByUserId   String?           @map("changed_by_user_id") @db.Uuid
+  changeReason      String            @map("change_reason")
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  relationshipRecord GraphRelationship @relation(fields: [relationshipId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, relationshipId, version])
+  @@index([organizationId, relationshipId, createdAt])
+  @@map("graph_relationship_versions")
+}
+
+model GraphProjection {
+  id              String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String              @map("organization_id") @db.Uuid
+  name            String
+  kind            GraphProjectionKind
+  rootEntityId    String?             @map("root_entity_id") @db.Uuid
+  projection      Json
+  provenance      Json
+  version         Int                 @default(1)
+  createdByUserId String?             @map("created_by_user_id") @db.Uuid
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([organizationId, name])
+  @@index([organizationId, kind, updatedAt])
+  @@map("graph_projections")
+}
+
+model MemoryRecord {
+  id                 String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId     String                     @map("organization_id") @db.Uuid
+  classification     MemoryRecordClassification
+  lifecycle          MemoryLifecycle            @default(proposed)
+  subjectEntityId    String?                    @map("subject_entity_id") @db.Uuid
+  claim              String
+  owner              String?
+  reasoning          String?
+  confidenceScore    Int                        @map("confidence_score")
+  confidenceBand     ConfidenceBand             @map("confidence_band")
+  confidenceMethod   String                     @map("confidence_method")
+  confidenceFactors  Json                       @map("confidence_factors")
+  missingEvidence    Json                       @map("missing_evidence")
+  counterevidence    Json
+  validFrom          DateTime?                  @map("valid_from") @db.Timestamptz(6)
+  validUntil         DateTime?                  @map("valid_until") @db.Timestamptz(6)
+  createdAt          DateTime                   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime                   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  evidenceItems      EvidenceItem[]
+  corrections        Correction[]
+
+  @@index([organizationId, lifecycle, classification])
+  @@map("memory_records")
+}
+
+model EvidenceItem {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String            @map("organization_id") @db.Uuid
+  memoryRecordId  String?           @map("memory_record_id") @db.Uuid
+  sourceType      String            @map("source_type")
+  sourceLocator   String            @map("source_locator")
+  sourceRevision  String?           @map("source_revision")
+  extractionMethod String           @map("extraction_method")
+  direction       EvidenceDirection @default(supports)
+  observedAt      DateTime          @map("observed_at") @db.Timestamptz(6)
+  metadata        Json
+  embedding       Unsupported("vector(1536)")?
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  memoryRecord    MemoryRecord?     @relation(fields: [memoryRecordId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, sourceType, observedAt])
+  @@map("evidence_items")
+}
+
+model Correction {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String       @map("organization_id") @db.Uuid
+  memoryRecordId  String       @map("memory_record_id") @db.Uuid
+  actorId         String       @map("actor_id") @db.Uuid
+  rationale       String
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  memoryRecord    MemoryRecord @relation(fields: [memoryRecordId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, memoryRecordId, createdAt])
+  @@map("corrections")
+}
+
+model Insight {
+  id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId      String         @map("organization_id") @db.Uuid
+  repositoryId        String?        @map("repository_id") @db.Uuid
+  capability          String
+  claim               String
+  impact              InsightImpact
+  status              InsightStatus  @default(open)
+  confidenceScore     Int            @map("confidence_score")
+  confidenceBand      ConfidenceBand @map("confidence_band")
+  confidenceMethod    String         @map("confidence_method")
+  confidenceFactors   Json           @map("confidence_factors")
+  missingEvidence     Json           @map("missing_evidence")
+  counterevidence     Json
+  evidenceSet         Json           @map("evidence_set")
+  recommendedAction   String         @map("recommended_action")
+  reevaluationTrigger Json           @map("reevaluation_trigger")
+  createdAt           DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([organizationId, repositoryId, status, impact])
+  @@map("insights")
+}
+
+model PulseAssessment {
+  id                   String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId       String         @map("organization_id") @db.Uuid
+  repositoryId         String         @map("repository_id") @db.Uuid
+  formulaVersion       String         @map("formula_version")
+  status               String
+  overallScore         Int?           @map("overall_score")
+  confidenceScore      Int            @map("confidence_score")
+  confidenceBand       ConfidenceBand @map("confidence_band")
+  dimensions           Json
+  evidenceSet          Json           @map("evidence_set")
+  missingEvidence      Json           @map("missing_evidence")
+  excludedEvidence     Json           @map("excluded_evidence")
+  trend                Json
+  calculatedAt         DateTime       @map("calculated_at") @db.Timestamptz(6)
+  createdAt            DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  repository           Repository     @relation(fields: [repositoryId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, repositoryId, calculatedAt])
+  @@map("pulse_assessments")
+}
+
+model AuditEvent {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String   @map("organization_id") @db.Uuid
+  actorId         String?  @map("actor_id") @db.Uuid
+  eventName       String   @map("event_name")
+  targetType      String   @map("target_type")
+  targetId        String?  @map("target_id") @db.Uuid
+  correlationId   String   @map("correlation_id")
+  metadata        Json
+  occurredAt      DateTime @default(now()) @map("occurred_at") @db.Timestamptz(6)
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actor           User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, eventName, occurredAt])
+  @@map("audit_events")
+}
+
+model OutboxEvent {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String    @map("organization_id") @db.Uuid
+  eventName       String    @map("event_name")
+  eventVersion    Int       @map("event_version")
+  payload         Json
+  correlationId   String    @map("correlation_id")
+  occurredAt      DateTime  @default(now()) @map("occurred_at") @db.Timestamptz(6)
+  publishedAt     DateTime? @map("published_at") @db.Timestamptz(6)
+
+  @@index([organizationId, eventName, occurredAt])
+  @@index([publishedAt])
+  @@map("outbox_events")
+}

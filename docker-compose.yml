@@ -1,0 +1,92 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: atlas
+      POSTGRES_USER: atlas
+      POSTGRES_PASSWORD: atlas
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atlas -d atlas"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - atlas_postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - atlas_redis_data:/data
+
+  api:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/api.Dockerfile
+    environment:
+      ATLAS_ENVIRONMENT: local
+      ATLAS_JWT_AUDIENCE: atlas-api
+      ATLAS_JWT_ISSUER: atlas-local
+      ATLAS_JWT_SECRET: local-secret-value-with-at-least-thirty-two-chars
+      ATLAS_INTERNAL_API_SECRET: local-internal-secret-with-at-least-thirty-two-chars
+      ATLAS_LOG_LEVEL: info
+      DATABASE_URL: postgresql://atlas:atlas@postgres:5432/atlas?schema=public
+      REDIS_URL: redis://redis:6379
+      ATLAS_API_PORT: 4000
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/worker.Dockerfile
+    environment:
+      ATLAS_ENVIRONMENT: local
+      ATLAS_JWT_AUDIENCE: atlas-api
+      ATLAS_JWT_ISSUER: atlas-local
+      ATLAS_JWT_SECRET: local-secret-value-with-at-least-thirty-two-chars
+      ATLAS_INTERNAL_API_SECRET: local-internal-secret-with-at-least-thirty-two-chars
+      ATLAS_LOG_LEVEL: info
+      DATABASE_URL: postgresql://atlas:atlas@postgres:5432/atlas?schema=public
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/web.Dockerfile
+    environment:
+      ATLAS_ENVIRONMENT: local
+      ATLAS_INTERNAL_API_SECRET: local-internal-secret-with-at-least-thirty-two-chars
+      AUTH_SECRET: local-secret-value-with-at-least-thirty-two-chars
+      AUTH_URL: http://localhost:3000
+      AUTH_GITHUB_ID: ${AUTH_GITHUB_ID:-replace-with-github-oauth-client-id}
+      AUTH_GITHUB_SECRET: ${AUTH_GITHUB_SECRET:-replace-with-github-oauth-client-secret}
+      NEXT_PUBLIC_ATLAS_API_URL: http://localhost:4000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  atlas_postgres_data:
+  atlas_redis_data:

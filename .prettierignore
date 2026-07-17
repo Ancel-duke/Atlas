@@ -1,0 +1,11 @@
+node_modules
+.corepack
+.local-bin
+dist
+.next
+coverage
+pnpm-lock.yaml
+packages/database/src/generated
+ATLAS_*.md
+docs/**/*.md
+infrastructure/docker/*.Dockerfile

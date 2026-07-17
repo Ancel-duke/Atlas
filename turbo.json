@@ -1,0 +1,40 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "ATLAS_ENVIRONMENT",
+    "ATLAS_INTERNAL_API_SECRET",
+    "ATLAS_JWT_AUDIENCE",
+    "ATLAS_JWT_ISSUER",
+    "ATLAS_JWT_SECRET",
+    "AUTH_GITHUB_ID",
+    "AUTH_GITHUB_SECRET",
+    "AUTH_SECRET",
+    "AUTH_URL",
+    "DATABASE_URL",
+    "NEXT_PUBLIC_ATLAS_API_URL",
+    "NODE_ENV",
+    "REDIS_URL"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "dist/**", "generated/**", "!.next/cache/**"]
+    },
+    "clean": {
+      "cache": false
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    }
+  }
+}

@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Package manager / local tooling
+.corepack/
+.local-bin/
+
+# Build outputs
+dist/
+.next/
+out/
+
+# Monorepo cache
+.turbo/
+
+# Generated code
+packages/database/src/generated/
+openapi.json
+
+# TypeScript
+*.tsbuildinfo
+
+# Test & coverage
+coverage/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Lint / format cache
+.eslintcache
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Deployment
+.vercel/
+
+# Local agent / editor artifacts
+.agents/
