@@ -15,7 +15,10 @@ const environment = parseServerEnvironment(process.env);
         url: environment.REDIS_URL
       }
     }),
-    BullModule.registerQueue({ name: queueNames.repositoryIngestion }),
+    BullModule.registerQueue(
+      { name: queueNames.repositoryIngestion },
+      { name: queueNames.continuousReasoning }
+    ),
     RepositoryIntelligenceModule
   ]
 })

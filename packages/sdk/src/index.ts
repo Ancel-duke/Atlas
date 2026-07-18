@@ -1,6 +1,8 @@
 import {
   authTokenResponseSchema,
   createInvitationResponseSchema,
+  createReasoningRunRequestSchema,
+  createRepositoryRequestSchema,
   correctionSchema,
   evidenceItemSchema,
   foundationStatusSchema,
@@ -10,6 +12,7 @@ import {
   graphTraversalResultSchema,
   graphVersionSchema,
   healthResponseSchema,
+  insightSchema,
   invitationSchema,
   memoryRecordSchema,
   memoryTimelineEventSchema,
@@ -17,6 +20,10 @@ import {
   membershipSchema,
   organizationSummarySchema,
   problemDetailsSchema,
+  pulseAssessmentSchema,
+  reasoningRunSchema,
+  repositorySchema,
+  updateRepositoryRequestSchema,
   type AcceptInvitationRequest,
   type AuthTokenResponse,
   type CreateInvitationRequest,
@@ -25,6 +32,8 @@ import {
   type CreateEvidenceItemRequest,
   type CreateMemoryRecordRequest,
   type CreateOrganizationRequest,
+  type CreateReasoningRunRequest,
+  type CreateRepositoryRequest,
   type Correction,
   type EvidenceItem,
   type FoundationStatus,
@@ -35,6 +44,7 @@ import {
   type GraphTraversalResult,
   type GraphVersion,
   type HealthResponse,
+  type Insight,
   type Invitation,
   type MemoryRecord,
   type MemoryTimelineEvent,
@@ -42,10 +52,14 @@ import {
   type Membership,
   type OrganizationSummary,
   type ProblemDetails,
+  type PulseAssessment,
+  type ReasoningRun,
+  type Repository,
   type ResolveGraphEntityRequest,
   type ReviewCorrectionRequest,
   type TransitionMemoryLifecycleRequest,
   type UpdateMemoryRecordRequest,
+  type UpdateRepositoryRequest,
   type UpsertGraphEntityRequest,
   type UpsertGraphProjectionRequest,
   type UpsertGraphRelationshipRequest
@@ -55,6 +69,7 @@ export type AtlasSdkOptions = {
   readonly baseUrl: string;
   readonly getAccessToken?: () => string | Promise<string | undefined> | undefined;
   readonly correlationId?: string;
+  readonly createIdempotencyKey?: () => string;
 };
 
 export class AtlasSdkError extends Error {
@@ -107,6 +122,45 @@ export class AtlasSdk {
         body: { organizationId }
       }
     );
+  }
+
+  public async listRepositories(): Promise<Repository[]> {
+    return this.request("/v1/repositories", (value) => repositorySchema.array().parse(value));
+  }
+
+  public async createRepository(input: CreateRepositoryRequest): Promise<Repository> {
+    return this.request("/v1/repositories", (value) => repositorySchema.parse(value), {
+      method: "POST",
+      body: createRepositoryRequestSchema.parse(input)
+    });
+  }
+
+  public async getRepository(repositoryId: string): Promise<Repository> {
+    return this.request(`/v1/repositories/${encodeURIComponent(repositoryId)}`, (value) =>
+      repositorySchema.parse(value)
+    );
+  }
+
+  public async updateRepository(
+    repositoryId: string,
+    input: UpdateRepositoryRequest
+  ): Promise<Repository> {
+    return this.request(
+      `/v1/repositories/${encodeURIComponent(repositoryId)}`,
+      (value) => repositorySchema.parse(value),
+      {
+        method: "PATCH",
+        body: updateRepositoryRequestSchema.parse(input)
+      }
+    );
+  }
+
+  public async listInsights(repositoryId?: string): Promise<Insight[]> {
+    const path =
+      repositoryId === undefined
+        ? "/v1/insights"
+        : `/v1/insights?repositoryId=${encodeURIComponent(repositoryId)}`;
+    return this.request(path, (value) => insightSchema.array().parse(value));
   }
 
   public async listMemberships(organizationId: string): Promise<Membership[]> {
@@ -322,6 +376,40 @@ export class AtlasSdk {
     );
   }
 
+  public async createReasoningRun(input: CreateReasoningRunRequest): Promise<ReasoningRun> {
+    return this.request("/v1/reasoning/runs", (value) => reasoningRunSchema.parse(value), {
+      method: "POST",
+      body: createReasoningRunRequestSchema.parse(input)
+    });
+  }
+
+  public async listReasoningRuns(): Promise<ReasoningRun[]> {
+    return this.request("/v1/reasoning/runs", (value) => reasoningRunSchema.array().parse(value));
+  }
+
+  public async getRepositoryPulse(repositoryId: string): Promise<PulseAssessment> {
+    return this.request(`/v1/repositories/${encodeURIComponent(repositoryId)}/pulse`, (value) =>
+      pulseAssessmentSchema.parse(value)
+    );
+  }
+
+  public async calculateRepositoryPulse(repositoryId: string): Promise<PulseAssessment> {
+    return this.request(
+      `/v1/repositories/${encodeURIComponent(repositoryId)}/pulse/assessments`,
+      (value) => pulseAssessmentSchema.parse(value),
+      {
+        method: "POST"
+      }
+    );
+  }
+
+  public async listRepositoryPulseHistory(repositoryId: string): Promise<PulseAssessment[]> {
+    return this.request(
+      `/v1/repositories/${encodeURIComponent(repositoryId)}/pulse/history`,
+      (value) => pulseAssessmentSchema.array().parse(value)
+    );
+  }
+
   private async request<T>(
     path: string,
     parse: (value: unknown) => T,
@@ -337,13 +425,21 @@ export class AtlasSdk {
       headers.set("x-correlation-id", this.options.correlationId);
     }
 
+    const method = options.method ?? "GET";
+    if (method !== "GET") {
+      headers.set(
+        "Idempotency-Key",
+        this.options.createIdempotencyKey?.() ?? generateIdempotencyKey()
+      );
+    }
+
     const accessToken = await this.options.getAccessToken?.();
     if (accessToken !== undefined) {
       headers.set("Authorization", `Bearer ${accessToken}`);
     }
 
     const requestInit: RequestInit = {
-      method: options.method ?? "GET",
+      method,
       headers
     };
 
@@ -352,7 +448,7 @@ export class AtlasSdk {
     }
 
     const response = await fetch(new URL(path, this.options.baseUrl), requestInit);
-    const body = (await response.json()) as unknown;
+    const body = await this.parseResponseBody(response);
 
     if (!response.ok) {
       const parsedProblem = problemDetailsSchema.safeParse(body);
@@ -365,4 +461,25 @@ export class AtlasSdk {
 
     return parse(body);
   }
+
+  private async parseResponseBody(response: Response): Promise<unknown> {
+    const text = await response.text();
+    if (text.trim().length === 0) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(text) as unknown;
+    } catch {
+      throw new AtlasSdkError("Atlas API returned an invalid JSON response.", response.status);
+    }
+  }
+}
+
+function generateIdempotencyKey(): string {
+  if (typeof globalThis.crypto?.randomUUID === "function") {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return `sdk-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 }

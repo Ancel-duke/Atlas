@@ -44,7 +44,8 @@ export const domainEventEnvelopeSchema = z.object({
 export type DomainEventEnvelope = z.infer<typeof domainEventEnvelopeSchema>;
 
 export const queueNames = {
-  repositoryIngestion: "repository.ingestion"
+  repositoryIngestion: "repository.ingestion",
+  continuousReasoning: "continuous.reasoning"
 } as const;
 
 export const organizationRoleSchema = z.enum(["owner", "admin", "member", "viewer"]);
@@ -68,6 +69,9 @@ export const organizationPermissionSchema = z.enum([
   "memory:correct",
   "repository:read",
   "repository:write",
+  "insight:read",
+  "reasoning:read",
+  "reasoning:run",
   "pulse:read",
   "audit:read"
 ]);
@@ -572,6 +576,311 @@ export const repositorySnapshotRequestedPayloadSchema = z.object({
 export type RepositorySnapshotRequestedPayload = z.infer<
   typeof repositorySnapshotRequestedPayloadSchema
 >;
+
+export const repositoryProviderSchema = z.enum(["github"]);
+export type RepositoryProvider = z.infer<typeof repositoryProviderSchema>;
+
+export const repositoryConnectionStatusSchema = z.enum([
+  "connected",
+  "suspended",
+  "revoked",
+  "archived"
+]);
+export type RepositoryConnectionStatus = z.infer<typeof repositoryConnectionStatusSchema>;
+
+export const repositorySchema = z.object({
+  id: uuidSchema,
+  organizationId: uuidSchema,
+  provider: repositoryProviderSchema,
+  providerRepositoryId: z.string().min(1),
+  name: z.string().min(1),
+  defaultBranch: z.string().min(1),
+  connectionStatus: repositoryConnectionStatusSchema,
+  createdAt: isoDateTimeSchema,
+  updatedAt: isoDateTimeSchema
+});
+export type Repository = z.infer<typeof repositorySchema>;
+
+export const createRepositoryRequestSchema = z.object({
+  provider: repositoryProviderSchema.default("github"),
+  providerRepositoryId: z.string().min(1).max(240),
+  name: z.string().min(1).max(240),
+  defaultBranch: z.string().min(1).max(120).default("main")
+});
+export type CreateRepositoryRequest = z.infer<typeof createRepositoryRequestSchema>;
+
+export const updateRepositoryRequestSchema = z.object({
+  name: z.string().min(1).max(240).optional(),
+  defaultBranch: z.string().min(1).max(120).optional(),
+  connectionStatus: repositoryConnectionStatusSchema.optional()
+});
+export type UpdateRepositoryRequest = z.infer<typeof updateRepositoryRequestSchema>;
+
+export const insightImpactSchema = z.enum(["low", "medium", "high", "critical"]);
+export type InsightImpact = z.infer<typeof insightImpactSchema>;
+
+export const insightStatusSchema = z.enum([
+  "open",
+  "acknowledged",
+  "resolved",
+  "dismissed",
+  "expired"
+]);
+export type InsightStatus = z.infer<typeof insightStatusSchema>;
+
+export const insightSchema = z.object({
+  id: uuidSchema,
+  organizationId: uuidSchema,
+  repositoryId: uuidSchema.nullable(),
+  capability: z.string().min(1),
+  claim: z.string().min(1),
+  impact: insightImpactSchema,
+  status: insightStatusSchema,
+  confidence: z.object({
+    score: z.number().int().min(0).max(100),
+    band: confidenceBandSchema,
+    method: z.string().min(1),
+    factors: z.record(z.unknown()),
+    missingEvidence: z.array(z.string().min(1)),
+    counterevidence: z.array(z.string().min(1))
+  }),
+  evidenceSet: z.array(z.unknown()),
+  recommendedAction: z.string().min(1),
+  reevaluationTrigger: z.record(z.unknown()),
+  createdAt: isoDateTimeSchema,
+  updatedAt: isoDateTimeSchema
+});
+export type Insight = z.infer<typeof insightSchema>;
+
+export const reasoningAgentRoleSchema = z.enum([
+  "orchestrator",
+  "architect",
+  "reviewer",
+  "historian",
+  "librarian",
+  "planner"
+]);
+export type ReasoningAgentRole = z.infer<typeof reasoningAgentRoleSchema>;
+
+export const reasoningRunStatusSchema = z.enum(["packaged", "evaluated", "persisted", "rejected"]);
+export type ReasoningRunStatus = z.infer<typeof reasoningRunStatusSchema>;
+
+export const reasoningEvaluationStatusSchema = z.enum(["passed", "failed"]);
+export type ReasoningEvaluationStatus = z.infer<typeof reasoningEvaluationStatusSchema>;
+
+export const reasoningImpactSchema = z.enum(["low", "medium", "high", "critical"]);
+export type ReasoningImpact = z.infer<typeof reasoningImpactSchema>;
+
+export const reasoningEvidenceRefSchema = z.object({
+  evidenceId: z.string().min(1),
+  relevance: z.string().min(1).max(1000)
+});
+export type ReasoningEvidenceRef = z.infer<typeof reasoningEvidenceRefSchema>;
+
+export const reasoningEvidenceItemSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(["graph_entity", "graph_relationship", "memory_record", "evidence_item"]),
+  sourceType: z.string().min(1),
+  sourceLocator: z.string().min(1),
+  sourceRevision: z.string().min(1).nullable(),
+  observedAt: isoDateTimeSchema,
+  summary: z.string().min(1),
+  payload: z.record(z.unknown())
+});
+export type ReasoningEvidenceItem = z.infer<typeof reasoningEvidenceItemSchema>;
+
+export const reasoningEvidencePackageSchema = z.object({
+  packageVersion: z.literal("reasoning-evidence-v1"),
+  generatedAt: isoDateTimeSchema,
+  question: z.string().min(3).max(2000),
+  evidence: z.array(reasoningEvidenceItemSchema),
+  graph: graphTraversalResultSchema.nullable(),
+  memoryRecordIds: z.array(uuidSchema),
+  missingEvidence: z.array(z.string().min(1)).default([])
+});
+export type ReasoningEvidencePackage = z.infer<typeof reasoningEvidencePackageSchema>;
+
+export const reasoningConclusionSchema = z.object({
+  claim: z.string().min(3).max(2000),
+  reasoning: z.string().min(1).max(4000),
+  evidence: z.array(reasoningEvidenceRefSchema).min(1),
+  confidence: z.object({
+    score: z.number().int().min(0).max(100),
+    band: confidenceBandSchema,
+    method: z.string().min(1),
+    factors: z.record(z.unknown()),
+    missingEvidence: z.array(z.string().min(1)).default([]),
+    counterevidence: z.array(z.string().min(1)).default([])
+  }),
+  impact: reasoningImpactSchema,
+  recommendedAction: z.string().min(1).max(2000),
+  reevaluationTrigger: z.string().min(1).max(1000)
+});
+export type ReasoningConclusion = z.infer<typeof reasoningConclusionSchema>;
+
+export const reasoningAgentOutputSchema = z.object({
+  role: reasoningAgentRoleSchema.exclude(["orchestrator"]),
+  promptVersion: z.string().min(1),
+  modelVersion: z.string().min(1),
+  conclusions: z.array(reasoningConclusionSchema).default([]),
+  abstained: z.boolean().default(false),
+  abstentionReason: z.string().min(1).max(1000).nullable().default(null)
+});
+export type ReasoningAgentOutput = z.infer<typeof reasoningAgentOutputSchema>;
+
+export const createReasoningRunRequestSchema = z.object({
+  question: z.string().min(3).max(2000),
+  rootEntityId: uuidSchema.nullable().default(null),
+  maxGraphDepth: z.number().int().min(1).max(3).default(2),
+  memoryRecordIds: z.array(uuidSchema).max(50).default([]),
+  repositoryId: uuidSchema.nullable().default(null),
+  promptVersion: z.string().min(1).max(120).default("continuous-reasoning-v1"),
+  modelVersion: z.string().min(1).max(120).default("atlas-evidence-gated-reasoner-v1")
+});
+export type CreateReasoningRunRequest = z.infer<typeof createReasoningRunRequestSchema>;
+
+export const reasoningPromptSchema = z.object({
+  role: reasoningAgentRoleSchema,
+  promptVersion: z.string().min(1),
+  instructions: z.string().min(1),
+  outputSchema: z.record(z.unknown())
+});
+export type ReasoningPrompt = z.infer<typeof reasoningPromptSchema>;
+
+export const reasoningEvaluationSchema = z.object({
+  id: uuidSchema,
+  reasoningRunId: uuidSchema,
+  status: reasoningEvaluationStatusSchema,
+  checks: z.array(
+    z.object({
+      name: z.string().min(1),
+      passed: z.boolean(),
+      message: z.string().min(1)
+    })
+  ),
+  createdAt: isoDateTimeSchema
+});
+export type ReasoningEvaluation = z.infer<typeof reasoningEvaluationSchema>;
+
+export const reasoningRunSchema = z.object({
+  id: uuidSchema,
+  organizationId: uuidSchema,
+  requestedByUserId: uuidSchema,
+  status: reasoningRunStatusSchema,
+  question: z.string().min(1),
+  promptVersion: z.string().min(1),
+  modelVersion: z.string().min(1),
+  evidencePackage: reasoningEvidencePackageSchema,
+  prompts: z.array(reasoningPromptSchema),
+  agentOutputs: z.array(reasoningAgentOutputSchema),
+  conclusions: z.array(reasoningConclusionSchema),
+  evaluation: reasoningEvaluationSchema.nullable(),
+  persistedInsightIds: z.array(uuidSchema),
+  createdAt: isoDateTimeSchema,
+  updatedAt: isoDateTimeSchema
+});
+export type ReasoningRun = z.infer<typeof reasoningRunSchema>;
+
+export const pulseDimensionKeySchema = z.enum([
+  "architectureIntegrity",
+  "knowledgeCoverage",
+  "ownershipCoverage",
+  "documentationFreshness",
+  "deploymentStability",
+  "testingConfidence"
+]);
+export type PulseDimensionKey = z.infer<typeof pulseDimensionKeySchema>;
+
+export const pulseStatusSchema = z.enum(["calculated", "insufficient-evidence"]);
+export type PulseStatus = z.infer<typeof pulseStatusSchema>;
+
+export const pulseTrendDirectionSchema = z.enum(["up", "down", "flat", "unknown"]);
+export type PulseTrendDirection = z.infer<typeof pulseTrendDirectionSchema>;
+
+export const pulseEvidenceSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(["repository", "snapshot", "insight", "graph_entity", "memory_record", "evidence"]),
+  label: z.string().min(1),
+  sourceType: z.string().min(1),
+  sourceLocator: z.string().min(1),
+  observedAt: isoDateTimeSchema,
+  summary: z.string().min(1)
+});
+export type PulseEvidence = z.infer<typeof pulseEvidenceSchema>;
+
+export const pulseScoreComponentSchema = z.object({
+  name: z.string().min(1),
+  value: z.number(),
+  max: z.number().positive(),
+  weight: z.number().min(0),
+  contribution: z.number(),
+  explanation: z.string().min(1),
+  evidenceIds: z.array(z.string().min(1)).default([])
+});
+export type PulseScoreComponent = z.infer<typeof pulseScoreComponentSchema>;
+
+export const pulseDimensionSchema = z.object({
+  key: pulseDimensionKeySchema,
+  label: z.string().min(1),
+  score: z.number().int().min(0).max(100).nullable(),
+  weight: z.number().min(0).max(1),
+  weightedContribution: z.number().min(0),
+  status: pulseStatusSchema,
+  confidence: z.object({
+    score: z.number().int().min(0).max(100),
+    band: confidenceBandSchema,
+    method: z.string().min(1),
+    factors: z.record(z.unknown())
+  }),
+  components: z.array(pulseScoreComponentSchema),
+  evidenceIds: z.array(z.string().min(1)),
+  missingEvidence: z.array(z.string().min(1)),
+  excludedEvidence: z.array(z.string().min(1)),
+  explanation: z.string().min(1)
+});
+export type PulseDimension = z.infer<typeof pulseDimensionSchema>;
+
+export const pulseTrendSchema = z.object({
+  direction: pulseTrendDirectionSchema,
+  delta: z.number().nullable(),
+  previousScore: z.number().int().min(0).max(100).nullable(),
+  currentScore: z.number().int().min(0).max(100).nullable(),
+  sampleSize: z.number().int().min(0),
+  explanation: z.string().min(1),
+  history: z.array(
+    z.object({
+      assessmentId: uuidSchema,
+      calculatedAt: isoDateTimeSchema,
+      overallScore: z.number().int().min(0).max(100).nullable(),
+      status: pulseStatusSchema
+    })
+  )
+});
+export type PulseTrend = z.infer<typeof pulseTrendSchema>;
+
+export const pulseAssessmentSchema = z.object({
+  id: uuidSchema,
+  organizationId: uuidSchema,
+  repositoryId: uuidSchema,
+  formulaVersion: z.literal("repository-pulse-v1"),
+  status: pulseStatusSchema,
+  overallScore: z.number().int().min(0).max(100).nullable(),
+  overallExplanation: z.string().min(1),
+  confidence: z.object({
+    score: z.number().int().min(0).max(100),
+    band: confidenceBandSchema,
+    method: z.string().min(1),
+    factors: z.record(z.unknown())
+  }),
+  dimensions: z.array(pulseDimensionSchema),
+  evidence: z.array(pulseEvidenceSchema),
+  missingEvidence: z.array(z.string().min(1)),
+  excludedEvidence: z.array(z.string().min(1)),
+  trend: pulseTrendSchema,
+  calculatedAt: isoDateTimeSchema,
+  createdAt: isoDateTimeSchema
+});
+export type PulseAssessment = z.infer<typeof pulseAssessmentSchema>;
 
 export const foundationStatusSchema = z.object({
   capabilityBoundaries: z.array(z.string().min(1)),
