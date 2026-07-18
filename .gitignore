@@ -1,57 +1,156 @@
 # Dependencies
 node_modules/
-.pnpm-store/
+**/node_modules/
 
-# Package manager / local tooling
+# pnpm local store and state
+.pnpm-store/
+**/.pnpm-store/
+.pnpm-state/
+**/.pnpm-state/
+
+# Local package-manager/tool shims
 .corepack/
 .local-bin/
 
-# Build outputs
+# Build output
 dist/
-.next/
+**/dist/
+build/
+**/build/
 out/
+**/out/
 
-# Monorepo cache
-.turbo/
+# Next.js output
+.next/
+**/.next/
 
-# Generated code
-packages/database/src/generated/
-openapi.json
-
-# TypeScript
+# NestJS/TypeScript incremental output
 *.tsbuildinfo
+**/*.tsbuildinfo
 
-# Test & coverage
+# Turbo cache
+.turbo/
+**/.turbo/
+
+# Prisma generated client output. Keep prisma/schema.prisma and migrations tracked.
+packages/database/src/generated/
+**/prisma/generated/
+**/.prisma/
+
+# Test, browser automation, and coverage artifacts
 coverage/
+**/coverage/
+.nyc_output/
+**/.nyc_output/
+test-results/
+**/test-results/
+playwright-report/
+**/playwright-report/
+blob-report/
+**/blob-report/
+.playwright/
+**/.playwright/
 
-# Environment & secrets
-.env
-.env.*
+# Vitest/Vite caches
+.vitest/
+**/.vitest/
+.vite/
+**/.vite/
+
+# Environment files and local secrets
+.env*
 !.env.example
 
 # Logs
+logs/
+**/logs/
 *.log
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
 
-# Lint / format cache
+# Caches and temporary files
+.cache/
+**/.cache/
 .eslintcache
-
-# IDE
-.idea/
-.vscode/
+.stylelintcache
+.sass-cache/
+tmp/
+temp/
+**/tmp/
+**/temp/
+*.tmp
+*.temp
+*.bak
 *.swp
 *.swo
+*~
 
-# OS
+# OpenTelemetry and local observability output
+.otel/
+**/.otel/
+otel-output/
+**/otel-output/
+opentelemetry-output/
+**/opentelemetry-output/
+
+# Generated reports
+reports/
+**/reports/
+report/
+**/report/
+*.lcov
+lcov.info
+
+# Local databases
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Local uploads
+uploads/
+**/uploads/
+local-uploads/
+**/local-uploads/
+
+# Docker local overrides. Keep Dockerfiles and base compose files tracked.
+docker-compose.override.yml
+docker-compose.override.yaml
+docker-compose.*.override.yml
+docker-compose.*.override.yaml
+compose.override.yml
+compose.override.yaml
+compose.*.override.yml
+compose.*.override.yaml
+
+# IDE/editor local state
+.idea/
+.vscode/settings.json
+.vscode/settings.local.json
+.vscode/*.code-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln.docstates
+
+# OS files
 .DS_Store
+.AppleDouble
+.LSOverride
 Thumbs.db
 Desktop.ini
 
-# Deployment
+# Deployment and local platform state
 .vercel/
+.netlify/
 
-# Local agent / editor artifacts
+# Local agent/editor artifacts
 .agents/

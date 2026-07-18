@@ -12,6 +12,8 @@ RUN pnpm --filter @atlas/api... build
 
 FROM base AS runtime
 ENV NODE_ENV=production
-COPY --from=build /workspace /workspace
+COPY --from=build --chown=node:node /workspace /workspace
 EXPOSE 4000
+USER node
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 CMD ["node", "-e", "const http=require('node:http');const req=http.get('http://127.0.0.1:4000/health',res=>process.exit(res.statusCode>=200&&res.statusCode<500?0:1));req.on('error',()=>process.exit(1));req.setTimeout(4000,()=>{req.destroy();process.exit(1);});"]
 CMD ["pnpm", "--filter", "@atlas/api", "start"]

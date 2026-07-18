@@ -12,5 +12,6 @@ RUN pnpm --filter @atlas/worker... build
 
 FROM base AS runtime
 ENV NODE_ENV=production
-COPY --from=build /workspace /workspace
+COPY --from=build --chown=node:node /workspace /workspace
+USER node
 CMD ["pnpm", "--filter", "@atlas/worker", "start"]
