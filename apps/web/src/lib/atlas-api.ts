@@ -9,7 +9,7 @@ export async function createAuthenticatedAtlasSdk(): Promise<AtlasSdk> {
   const environment = getWebEnvironment();
 
   return new AtlasSdk({
-    baseUrl: environment.NEXT_PUBLIC_ATLAS_API_URL,
+    baseUrl: environment.ATLAS_API_INTERNAL_URL ?? environment.NEXT_PUBLIC_ATLAS_API_URL,
     getAccessToken: () => session?.atlas?.accessToken
   });
 }

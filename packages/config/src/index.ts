@@ -36,6 +36,7 @@ const webEnvironmentSchema = z.object({
   ATLAS_ENVIRONMENT: z.enum(["local", "test", "staging", "production"]).default("local"),
   ATLAS_WEB_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   NEXT_PUBLIC_ATLAS_API_URL: z.string().url().default("http://localhost:4000"),
+  ATLAS_API_INTERNAL_URL: z.string().url().optional(),
   ATLAS_INTERNAL_API_SECRET: z.string().min(32),
   AUTH_GITHUB_ID: z.string().min(1),
   AUTH_GITHUB_SECRET: z.string().min(1),

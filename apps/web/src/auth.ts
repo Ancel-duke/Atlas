@@ -6,6 +6,7 @@ import { z } from "zod";
 import { getWebEnvironment } from "./lib/web-environment";
 
 const environment = getWebEnvironment();
+const atlasApiBaseUrl = environment.ATLAS_API_INTERNAL_URL ?? environment.NEXT_PUBLIC_ATLAS_API_URL;
 
 const githubProfileSchema = z.object({
   id: z.union([z.string(), z.number()]).transform(String),
@@ -69,19 +70,16 @@ async function exchangeGitHubProfile(profile: unknown, accessToken: string | und
     profileUrl: parsedProfile.html_url ?? null
   });
 
-  const response = await fetch(
-    new URL("/v1/identity/oauth/github", environment.NEXT_PUBLIC_ATLAS_API_URL),
-    {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "x-atlas-internal-secret": environment.ATLAS_INTERNAL_API_SECRET,
-        "x-correlation-id": crypto.randomUUID()
-      },
-      body: JSON.stringify(request)
-    }
-  );
+  const response = await fetch(new URL("/v1/identity/oauth/github", atlasApiBaseUrl), {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "x-atlas-internal-secret": environment.ATLAS_INTERNAL_API_SECRET,
+      "x-correlation-id": crypto.randomUUID()
+    },
+    body: JSON.stringify(request)
+  });
 
   const body = (await response.json()) as unknown;
 
