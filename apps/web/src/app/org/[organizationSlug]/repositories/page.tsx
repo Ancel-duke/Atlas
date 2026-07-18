@@ -7,7 +7,7 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@atlas/
 
 import {
   AtlasShell,
-  DemoEmptyState,
+  EvidenceEmptyState,
   PageIntro,
   TrustStrip
 } from "../../../../components/atlas-shell";
@@ -111,7 +111,7 @@ export default async function RepositoriesPage({ params }: PageProps): Promise<J
       {repositories.length === 0 ? (
         <Card>
           <CardContent>
-            <DemoEmptyState
+            <EvidenceEmptyState
               icon={GitBranch}
               title="No repositories yet"
               body="Without a repository, Atlas has no durable anchor for deployment risk, ownership, architecture, or documentation drift."

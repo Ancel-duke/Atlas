@@ -7,7 +7,7 @@ import { Badge, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
 
 import {
   AtlasShell,
-  DemoEmptyState,
+  EvidenceEmptyState,
   PageIntro,
   TrustStrip
 } from "../../../../components/atlas-shell";
@@ -42,7 +42,7 @@ export default async function TimelineViewerPage({ params }: PageProps): Promise
     >
       <PageIntro
         title="Atlas preserves engineering history."
-        body="The timeline makes change visible. A judge should be able to see when a claim was created, updated, challenged, or corrected."
+        body="The timeline makes change visible so reviewers can see when a claim was created, updated, challenged, or corrected."
         facts={["Append-only events", "Versioned records", "Correction trail"]}
       />
 
@@ -78,7 +78,7 @@ export default async function TimelineViewerPage({ params }: PageProps): Promise
         </CardHeader>
         <CardContent>
           {events.length === 0 ? (
-            <DemoEmptyState
+            <EvidenceEmptyState
               icon={Clock3}
               title="No timeline events"
               body="No timeline means Atlas has not yet observed durable engineering knowledge changing."

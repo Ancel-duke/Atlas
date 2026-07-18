@@ -2,11 +2,11 @@ import { Network, Search } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import type { JSX } from "react";
 
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
 
 import {
   AtlasShell,
-  DemoEmptyState,
+  EvidenceEmptyState,
   EvidenceDisclosure,
   PageIntro,
   TrustStrip
@@ -87,12 +87,7 @@ export default async function GraphExplorerPage({
                   />
                 </div>
               </label>
-              <button
-                className="rounded-md bg-slate-950 px-3 py-2 text-sm font-medium text-white dark:bg-emerald-400 dark:text-slate-950"
-                type="submit"
-              >
-                Apply filter
-              </button>
+              <Button type="submit">Apply filter</Button>
             </form>
             <div className="mt-5 flex flex-wrap gap-2">
               {entityTypes.map((type) => (
@@ -115,7 +110,7 @@ export default async function GraphExplorerPage({
             </CardHeader>
             <CardContent className="grid gap-3 lg:grid-cols-2">
               {entities.length === 0 ? (
-                <DemoEmptyState
+                <EvidenceEmptyState
                   icon={Network}
                   title="No graph entities yet"
                   body="Atlas cannot claim architectural understanding until repository facts have been extracted into graph entities."

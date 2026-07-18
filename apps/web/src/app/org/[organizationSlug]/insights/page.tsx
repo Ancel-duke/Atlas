@@ -2,11 +2,11 @@ import { Filter, Inbox } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import type { JSX } from "react";
 
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
 
 import {
   AtlasShell,
-  DemoEmptyState,
+  EvidenceEmptyState,
   EvidenceDisclosure,
   PageIntro,
   TrustStrip
@@ -92,12 +92,7 @@ export default async function InsightFeedPage({
                   </option>
                 ))}
               </select>
-              <button
-                className="rounded-md bg-slate-950 px-3 py-2 text-sm font-medium text-white dark:bg-emerald-400 dark:text-slate-950"
-                type="submit"
-              >
-                Apply
-              </button>
+              <Button type="submit">Apply</Button>
             </form>
           </CardContent>
         </Card>
@@ -108,7 +103,7 @@ export default async function InsightFeedPage({
           </CardHeader>
           <CardContent className="space-y-3">
             {insights.length === 0 ? (
-              <DemoEmptyState
+              <EvidenceEmptyState
                 icon={Inbox}
                 title="No insights match this filter"
                 body="This is acceptable when Atlas lacks enough evidence. Empty is better than invented engineering advice."

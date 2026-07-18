@@ -6,12 +6,12 @@ RUN corepack enable
 RUN apt-get update -y && apt-get install -y --no-install-recommends ca-certificates openssl && rm -rf /var/lib/apt/lists/*
 
 FROM base AS build
-ARG ATLAS_INTERNAL_API_SECRET=local-internal-secret-with-at-least-thirty-two-chars
-ARG AUTH_GITHUB_ID=replace-with-github-oauth-client-id
-ARG AUTH_GITHUB_SECRET=replace-with-github-oauth-client-secret
-ARG AUTH_SECRET=local-secret-value-with-at-least-thirty-two-chars
-ARG AUTH_URL=http://localhost:3000
-ARG NEXT_PUBLIC_ATLAS_API_URL=http://localhost:4000
+ARG ATLAS_INTERNAL_API_SECRET
+ARG AUTH_GITHUB_ID
+ARG AUTH_GITHUB_SECRET
+ARG AUTH_SECRET
+ARG AUTH_URL
+ARG NEXT_PUBLIC_ATLAS_API_URL
 ENV ATLAS_INTERNAL_API_SECRET=$ATLAS_INTERNAL_API_SECRET
 ENV AUTH_GITHUB_ID=$AUTH_GITHUB_ID
 ENV AUTH_GITHUB_SECRET=$AUTH_GITHUB_SECRET

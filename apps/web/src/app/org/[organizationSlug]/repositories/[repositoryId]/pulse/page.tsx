@@ -10,6 +10,7 @@ import {
   Truck,
   Users
 } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { JSX } from "react";
 
@@ -213,7 +214,7 @@ function PulseUnavailable({
               Atlas could not locate this repository in the active organization context.
             </p>
             <Button asChild className="mt-4" variant="secondary">
-              <a href={`/org/${organizationSlug}`}>Back to organization</a>
+              <Link href={`/org/${organizationSlug}`}>Back to organization</Link>
             </Button>
           </div>
         </CardContent>

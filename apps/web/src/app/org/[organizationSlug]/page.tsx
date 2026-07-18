@@ -8,7 +8,7 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@atlas/
 import { AnimatedNumber } from "../../../components/animated-number";
 import {
   AtlasShell,
-  DemoEmptyState,
+  EvidenceEmptyState,
   PageIntro,
   StatusPill,
   TrustStrip
@@ -131,7 +131,7 @@ export default async function OrganizationPage(props: OrganizationPageProps): Pr
           </CardHeader>
           <CardContent className="space-y-3">
             {repositories.length === 0 ? (
-              <DemoEmptyState
+              <EvidenceEmptyState
                 icon={GitBranch}
                 title="No repositories connected"
                 body="Connect a repository to activate Pulse, graph retrieval, insights, evidence, and timelines."
@@ -171,7 +171,7 @@ export default async function OrganizationPage(props: OrganizationPageProps): Pr
           </CardHeader>
           <CardContent className="space-y-3">
             {openInsights.length === 0 ? (
-              <DemoEmptyState
+              <EvidenceEmptyState
                 icon={Inbox}
                 title="No open insights"
                 body="Insights from Continuous Reasoning and Repository Pulse will appear here when supported by evidence."

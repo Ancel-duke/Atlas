@@ -7,7 +7,7 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@atlas/
 import { createReasoningRunAction } from "../../../actions";
 import {
   AtlasShell,
-  DemoEmptyState,
+  EvidenceEmptyState,
   EvidenceDisclosure,
   PageIntro,
   TrustStrip
@@ -116,10 +116,10 @@ export default async function EngineeringChatPage({ params }: PageProps): Promis
           </CardHeader>
           <CardContent className="space-y-3">
             {runs.length === 0 ? (
-              <DemoEmptyState
+              <EvidenceEmptyState
                 icon={Bot}
                 title="No reasoning runs yet"
-                body="A first run should demonstrate Atlas' judgment: it packages evidence, orchestrates agents, validates outputs, and withholds unsupported claims."
+                body="A reasoning run packages evidence, orchestrates agents, validates outputs, and withholds unsupported claims."
                 nextStep="Ask about launch risk, ownership gaps, or architecture drift. Then open the run and inspect evidence and prompts."
               />
             ) : (

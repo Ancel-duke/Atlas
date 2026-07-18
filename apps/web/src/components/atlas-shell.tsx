@@ -180,7 +180,7 @@ export function StatusPill({
   );
 }
 
-export function DemoEmptyState({
+export function EvidenceEmptyState({
   icon: Icon,
   title,
   body,
