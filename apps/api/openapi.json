@@ -1,0 +1,1240 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1/graph/entities": {
+      "post": {
+        "operationId": "AtlasMemoryGraphController_upsertEntity",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create or update a graph entity with provenance and versioning.",
+        "tags": ["atlas-memory-graph"]
+      },
+      "get": {
+        "operationId": "AtlasMemoryGraphController_listEntities",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List graph entities in the current organization.",
+        "tags": ["atlas-memory-graph"]
+      }
+    },
+    "/v1/graph/entities/resolve": {
+      "post": {
+        "operationId": "AtlasMemoryGraphController_resolveEntity",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resolve an entity by canonical key or alias.",
+        "tags": ["atlas-memory-graph"]
+      }
+    },
+    "/v1/graph/entities/{entityId}/versions": {
+      "get": {
+        "operationId": "AtlasMemoryGraphController_listEntityVersions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List append-only versions for a graph entity.",
+        "tags": ["atlas-memory-graph"]
+      }
+    },
+    "/v1/graph/relationships": {
+      "post": {
+        "operationId": "AtlasMemoryGraphController_upsertRelationship",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create or update a graph relationship with provenance and versioning.",
+        "tags": ["atlas-memory-graph"]
+      }
+    },
+    "/v1/graph/traverse": {
+      "post": {
+        "operationId": "AtlasMemoryGraphController_traverse",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Traverse the Atlas Memory Graph for explorer and AI reasoning use.",
+        "tags": ["atlas-memory-graph"]
+      }
+    },
+    "/v1/graph/projections": {
+      "post": {
+        "operationId": "AtlasMemoryGraphController_upsertProjection",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create or update a saved graph projection.",
+        "tags": ["atlas-memory-graph"]
+      },
+      "get": {
+        "operationId": "AtlasMemoryGraphController_listProjections",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List saved graph projections for the current organization.",
+        "tags": ["atlas-memory-graph"]
+      }
+    },
+    "/v1/reasoning/runs": {
+      "post": {
+        "operationId": "ContinuousReasoningController_createRun",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "ReasoningRun response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReasoningRun"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Package evidence, orchestrate specialist prompts, evaluate structured outputs, and persist supported insights.",
+        "tags": ["continuous-reasoning"]
+      },
+      "get": {
+        "operationId": "ContinuousReasoningController_listRuns",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "ReasoningRun response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReasoningRun"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List Continuous Reasoning runs for the current organization.",
+        "tags": ["continuous-reasoning"]
+      }
+    },
+    "/v1/reasoning/runs/{reasoningRunId}": {
+      "get": {
+        "operationId": "ContinuousReasoningController_getRun",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a Continuous Reasoning run with prompts, evidence, outputs, and evaluation.",
+        "tags": ["continuous-reasoning"]
+      }
+    },
+    "/v1/memory/records": {
+      "post": {
+        "operationId": "EngineeringMemoryController_createRecord",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create an evidence-backed memory record.",
+        "tags": ["engineering-memory"]
+      },
+      "get": {
+        "operationId": "EngineeringMemoryController_listRecords",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List memory records in the current organization.",
+        "tags": ["engineering-memory"]
+      }
+    },
+    "/v1/memory/records/{memoryRecordId}": {
+      "get": {
+        "operationId": "EngineeringMemoryController_getRecord",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a memory record.",
+        "tags": ["engineering-memory"]
+      },
+      "patch": {
+        "operationId": "EngineeringMemoryController_updateRecord",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update the current memory projection and append a version.",
+        "tags": ["engineering-memory"]
+      }
+    },
+    "/v1/memory/records/{memoryRecordId}/lifecycle": {
+      "post": {
+        "operationId": "EngineeringMemoryController_transitionLifecycle",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Transition memory lifecycle with history preservation.",
+        "tags": ["engineering-memory"]
+      }
+    },
+    "/v1/memory/records/{memoryRecordId}/evidence": {
+      "post": {
+        "operationId": "EngineeringMemoryController_addEvidence",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add immutable evidence to a memory record.",
+        "tags": ["engineering-memory"]
+      },
+      "get": {
+        "operationId": "EngineeringMemoryController_listEvidence",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List evidence items for a memory record.",
+        "tags": ["engineering-memory"]
+      }
+    },
+    "/v1/memory/records/{memoryRecordId}/corrections": {
+      "post": {
+        "operationId": "EngineeringMemoryController_createCorrection",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Request a correction to a memory record.",
+        "tags": ["engineering-memory"]
+      },
+      "get": {
+        "operationId": "EngineeringMemoryController_listCorrections",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List corrections for a memory record.",
+        "tags": ["engineering-memory"]
+      }
+    },
+    "/v1/memory/corrections/{correctionId}/review": {
+      "post": {
+        "operationId": "EngineeringMemoryController_reviewCorrection",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Apply or reject a pending memory correction.",
+        "tags": ["engineering-memory"]
+      }
+    },
+    "/v1/memory/records/{memoryRecordId}/versions": {
+      "get": {
+        "operationId": "EngineeringMemoryController_listRecordVersions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List append-only historical versions for a memory record.",
+        "tags": ["engineering-memory"]
+      }
+    },
+    "/v1/memory/evidence/{evidenceItemId}/versions": {
+      "get": {
+        "operationId": "EngineeringMemoryController_listEvidenceVersions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List append-only historical versions for an evidence item.",
+        "tags": ["engineering-memory"]
+      }
+    },
+    "/v1/memory/records/{memoryRecordId}/timeline": {
+      "get": {
+        "operationId": "EngineeringMemoryController_listTimeline",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List timeline events for a memory record.",
+        "tags": ["engineering-memory"]
+      }
+    },
+    "/v1/github/webhooks": {
+      "post": {
+        "operationId": "GitHubWebhookController_receive",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "GitHubWebhookAccepted response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubWebhookAccepted"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Verify a GitHub webhook and enqueue repository ingestion.",
+        "tags": ["github"]
+      }
+    },
+    "/v1/identity/session": {
+      "get": {
+        "operationId": "IdentityController_getSession",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Authenticated principal metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationSummary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Validate the caller JWT and return principal metadata.",
+        "tags": ["identity"]
+      }
+    },
+    "/v1/identity/oauth/github": {
+      "post": {
+        "operationId": "IdentityController_exchangeGitHubOAuth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Atlas access token and tenant-scoped principal.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokenResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Exchange a verified Auth.js GitHub profile for an Atlas JWT.",
+        "tags": ["identity"]
+      }
+    },
+    "/v1/insights": {
+      "get": {
+        "operationId": "InsightsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Insight response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Insight"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List explainable insights for the current organization.",
+        "tags": ["insights"]
+      }
+    },
+    "/v1/organizations": {
+      "get": {
+        "operationId": "OrganizationController_listOrganizations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Organization memberships for the current user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationSummary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List organizations available to the authenticated user.",
+        "tags": ["organizations"]
+      },
+      "post": {
+        "operationId": "OrganizationController_createOrganization",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "AuthTokenResponse response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokenResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new organization and switch into it.",
+        "tags": ["organizations"]
+      }
+    },
+    "/v1/organizations/current": {
+      "get": {
+        "operationId": "OrganizationController_getCurrentOrganization",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OrganizationSummary response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationSummary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Return the current organization selected by the JWT.",
+        "tags": ["organizations"]
+      }
+    },
+    "/v1/organizations/switch": {
+      "post": {
+        "operationId": "OrganizationController_switchOrganization",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "AuthTokenResponse response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokenResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Switch the current organization and issue a new Atlas JWT.",
+        "tags": ["organizations"]
+      }
+    },
+    "/v1/organizations/{organizationId}/memberships": {
+      "get": {
+        "operationId": "OrganizationController_listMemberships",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Membership response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Membership"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List memberships for the current organization.",
+        "tags": ["organizations"]
+      }
+    },
+    "/v1/organizations/{organizationId}/memberships/{membershipId}": {
+      "patch": {
+        "operationId": "OrganizationController_updateMembership",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Membership response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Membership"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a membership role or status.",
+        "tags": ["organizations"]
+      }
+    },
+    "/v1/organizations/{organizationId}/invitations": {
+      "get": {
+        "operationId": "OrganizationController_listInvitations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Invitation response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Invitation"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List invitations for the current organization.",
+        "tags": ["organizations"]
+      },
+      "post": {
+        "operationId": "OrganizationController_createInvitation",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create an invitation for the current organization.",
+        "tags": ["organizations"]
+      }
+    },
+    "/v1/invitations/accept": {
+      "post": {
+        "operationId": "OrganizationController_acceptInvitation",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Accept an invitation and switch into the invited organization.",
+        "tags": ["organizations"]
+      }
+    },
+    "/v1/repositories": {
+      "get": {
+        "operationId": "RepositoriesController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Repository response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Repository"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List repositories in the current organization.",
+        "tags": ["repositories"]
+      },
+      "post": {
+        "operationId": "RepositoriesController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Repository response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Connect or update a repository record.",
+        "tags": ["repositories"]
+      }
+    },
+    "/v1/repositories/{repositoryId}": {
+      "get": {
+        "operationId": "RepositoriesController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Repository response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a repository.",
+        "tags": ["repositories"]
+      },
+      "patch": {
+        "operationId": "RepositoriesController_update",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Repository response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Repository"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update repository settings.",
+        "tags": ["repositories"]
+      }
+    },
+    "/v1/repositories/{repositoryId}/pulse": {
+      "get": {
+        "operationId": "RepositoryPulseController_getPulse",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "PulseAssessment response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PulseAssessment"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the latest explainable Repository Pulse assessment, calculating one if needed.",
+        "tags": ["repository-pulse"]
+      }
+    },
+    "/v1/repositories/{repositoryId}/pulse/assessments": {
+      "post": {
+        "operationId": "RepositoryPulseController_calculatePulse",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "PulseAssessment response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PulseAssessment"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Calculate and persist a new explainable Repository Pulse assessment.",
+        "tags": ["repository-pulse"]
+      }
+    },
+    "/v1/repositories/{repositoryId}/pulse/history": {
+      "get": {
+        "operationId": "RepositoryPulseController_listHistory",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "PulseAssessment response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PulseAssessment"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List historical Repository Pulse assessments for trend analysis.",
+        "tags": ["repository-pulse"]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "SystemController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "API is accepting requests.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Return API liveness for platform operations.",
+        "tags": ["system"]
+      }
+    },
+    "/v1/system/foundation": {
+      "get": {
+        "operationId": "SystemController_getFoundationStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Foundation capabilities and configured dependencies.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FoundationStatus"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Return foundation configuration status for authenticated operators.",
+        "tags": ["system"]
+      }
+    }
+  },
+  "info": {
+    "title": "Atlas API",
+    "description": "Versioned REST API for the Atlas engineering foundation.",
+    "version": "0.1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "ProblemDetails": {
+        "type": "object",
+        "required": ["type", "title", "status"],
+        "additionalProperties": true,
+        "properties": {
+          "type": {},
+          "title": {},
+          "status": {}
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "required": ["status", "service", "environment", "timestamp", "version"],
+        "additionalProperties": true,
+        "properties": {
+          "status": {},
+          "service": {},
+          "environment": {},
+          "timestamp": {},
+          "version": {}
+        }
+      },
+      "GitHubWebhookAccepted": {
+        "type": "object",
+        "required": ["accepted", "enqueued"],
+        "additionalProperties": true,
+        "properties": {
+          "accepted": {},
+          "enqueued": {}
+        }
+      },
+      "FoundationStatus": {
+        "type": "object",
+        "required": ["capabilityBoundaries", "database", "redis", "openTelemetry"],
+        "additionalProperties": true,
+        "properties": {
+          "capabilityBoundaries": {},
+          "database": {},
+          "redis": {},
+          "openTelemetry": {}
+        }
+      },
+      "AuthTokenResponse": {
+        "type": "object",
+        "required": ["accessToken", "expiresAt", "principal", "organizations"],
+        "additionalProperties": true,
+        "properties": {
+          "accessToken": {},
+          "expiresAt": {},
+          "principal": {},
+          "organizations": {}
+        }
+      },
+      "OrganizationSummary": {
+        "type": "object",
+        "required": ["id", "slug", "displayName", "role", "permissions"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "slug": {},
+          "displayName": {},
+          "role": {},
+          "permissions": {}
+        }
+      },
+      "Membership": {
+        "type": "object",
+        "required": ["id", "organizationId", "userId", "email", "role", "status"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "userId": {},
+          "email": {},
+          "role": {},
+          "status": {}
+        }
+      },
+      "Invitation": {
+        "type": "object",
+        "required": ["id", "organizationId", "email", "role", "status"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "email": {},
+          "role": {},
+          "status": {}
+        }
+      },
+      "Repository": {
+        "type": "object",
+        "required": ["id", "organizationId", "provider", "providerRepositoryId", "name"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "provider": {},
+          "providerRepositoryId": {},
+          "name": {}
+        }
+      },
+      "GraphEntity": {
+        "type": "object",
+        "required": ["id", "organizationId", "entityType", "canonicalKey", "provenance"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "entityType": {},
+          "canonicalKey": {},
+          "provenance": {}
+        }
+      },
+      "GraphRelationship": {
+        "type": "object",
+        "required": ["id", "organizationId", "sourceEntityId", "targetEntityId", "relationship"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "sourceEntityId": {},
+          "targetEntityId": {},
+          "relationship": {}
+        }
+      },
+      "GraphTraversalResult": {
+        "type": "object",
+        "required": ["rootEntityId", "maxDepth", "nodes", "edges"],
+        "additionalProperties": true,
+        "properties": {
+          "rootEntityId": {},
+          "maxDepth": {},
+          "nodes": {},
+          "edges": {}
+        }
+      },
+      "GraphProjection": {
+        "type": "object",
+        "required": ["id", "organizationId", "name", "kind", "projection"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "name": {},
+          "kind": {},
+          "projection": {}
+        }
+      },
+      "MemoryRecord": {
+        "type": "object",
+        "required": ["id", "organizationId", "classification", "claim", "confidence"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "classification": {},
+          "claim": {},
+          "confidence": {}
+        }
+      },
+      "EvidenceItem": {
+        "type": "object",
+        "required": ["id", "organizationId", "sourceType", "sourceLocator", "direction"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "sourceType": {},
+          "sourceLocator": {},
+          "direction": {}
+        }
+      },
+      "Correction": {
+        "type": "object",
+        "required": ["id", "organizationId", "memoryRecordId", "status", "rationale"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "memoryRecordId": {},
+          "status": {},
+          "rationale": {}
+        }
+      },
+      "MemoryTimelineEvent": {
+        "type": "object",
+        "required": ["id", "organizationId", "memoryRecordId", "eventType"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "memoryRecordId": {},
+          "eventType": {}
+        }
+      },
+      "MemoryVersion": {
+        "type": "object",
+        "required": ["id", "organizationId", "subjectId", "version", "snapshot"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "subjectId": {},
+          "version": {},
+          "snapshot": {}
+        }
+      },
+      "Insight": {
+        "type": "object",
+        "required": ["id", "organizationId", "claim", "impact", "confidence", "evidenceSet"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "claim": {},
+          "impact": {},
+          "confidence": {},
+          "evidenceSet": {}
+        }
+      },
+      "ReasoningRun": {
+        "type": "object",
+        "required": ["id", "organizationId", "status", "evidencePackage", "conclusions"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "status": {},
+          "evidencePackage": {},
+          "conclusions": {}
+        }
+      },
+      "PulseAssessment": {
+        "type": "object",
+        "required": ["id", "organizationId", "repositoryId", "formulaVersion", "dimensions"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {},
+          "organizationId": {},
+          "repositoryId": {},
+          "formulaVersion": {},
+          "dimensions": {}
+        }
+      }
+    }
+  }
+}

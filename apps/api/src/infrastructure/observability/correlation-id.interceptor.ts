@@ -1,5 +1,6 @@
 import type { CallHandler, ExecutionContext, NestInterceptor } from "@nestjs/common";
 import { Injectable } from "@nestjs/common";
+import { trace } from "@opentelemetry/api";
 import type { Request, Response } from "express";
 import type { Observable } from "rxjs";
 
@@ -13,6 +14,13 @@ export class CorrelationIdInterceptor implements NestInterceptor {
     const correlationId = incomingCorrelationId ?? crypto.randomUUID();
 
     response.setHeader("x-correlation-id", correlationId);
+    Object.defineProperty(request, "correlationId", {
+      value: correlationId,
+      enumerable: false,
+      configurable: false,
+      writable: false
+    });
+    trace.getActiveSpan()?.setAttribute("atlas.correlation_id", correlationId);
     return next.handle();
   }
 }

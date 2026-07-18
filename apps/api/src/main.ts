@@ -5,20 +5,25 @@ import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import helmet from "helmet";
 
+import { parseServerEnvironment } from "@atlas/config";
+
 import { AppModule } from "./app.module.js";
 import { CorrelationIdInterceptor } from "./infrastructure/observability/correlation-id.interceptor.js";
 import { startOpenTelemetry } from "./infrastructure/observability/open-telemetry.js";
+import { ProblemDetailsFilter } from "./infrastructure/http/problem-details.filter.js";
 
 async function bootstrap(): Promise<void> {
   const telemetry = startOpenTelemetry("atlas-api");
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const environment = parseServerEnvironment(process.env);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true, rawBody: true });
   const logger = new Logger("Bootstrap");
 
   app.use(helmet());
   app.enableCors({
-    origin: [/^http:\/\/localhost:\d+$/],
+    origin: environment.ATLAS_WEB_ORIGINS,
     credentials: true
   });
+  app.useGlobalFilters(new ProblemDetailsFilter());
   app.useGlobalInterceptors(new CorrelationIdInterceptor());
 
   const document = SwaggerModule.createDocument(
@@ -32,7 +37,7 @@ async function bootstrap(): Promise<void> {
   );
   SwaggerModule.setup("/v1/docs", app, document);
 
-  const port = Number(process.env["ATLAS_API_PORT"] ?? "4000");
+  const port = environment.ATLAS_API_PORT;
   await app.listen(port);
   logger.log(`Atlas API listening on port ${port}`);
 
