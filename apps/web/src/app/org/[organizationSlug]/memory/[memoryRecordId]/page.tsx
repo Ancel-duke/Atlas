@@ -4,6 +4,7 @@ import type { JSX, ReactNode } from "react";
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
 
+import { AtlasShell, PageIntro, TrustStrip } from "../../../../../components/atlas-shell";
 import { createAuthenticatedAtlasSdk, requireAtlasSession } from "../../../../../lib/atlas-api";
 import {
   addMemoryEvidenceAction,
@@ -45,21 +46,41 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
   ]);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-6 py-10">
-      <header className="flex items-start justify-between border-b border-slate-200 pb-5">
-        <div>
-          <p className="text-sm font-medium text-slate-500">{organizationSlug}</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-normal text-slate-950">
-            Memory Record
-          </h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Current projection v{record.version}; historical versions and timeline are preserved.
-          </p>
-        </div>
+    <AtlasShell
+      organizationSlug={organizationSlug}
+      title="Memory Record"
+      description={`Current projection v${record.version}; historical versions, corrections, evidence, and timeline events are preserved.`}
+      actions={
         <Button asChild variant="secondary">
           <Link href={`/org/${organizationSlug}/memory`}>Back to memory</Link>
         </Button>
-      </header>
+      }
+    >
+      <PageIntro
+        title="This is a claim with a paper trail."
+        body="Atlas shows the current memory projection beside the evidence, corrections, lifecycle controls, timeline, and historical versions that determine whether the claim should be trusted."
+        facts={["Current projection", "Evidence ledger", "Correction path"]}
+      />
+
+      <TrustStrip
+        items={[
+          {
+            label: "Confidence",
+            value: `${record.confidence.score}/100 ${record.confidence.band}`,
+            tone: record.confidence.band === "low" ? "warning" : "success"
+          },
+          {
+            label: "Evidence",
+            value: `${evidence.length} items`,
+            tone: evidence.length > 0 ? "success" : "warning"
+          },
+          {
+            label: "History",
+            value: `${versions.length} versions, ${timeline.length} events`,
+            tone: versions.length + timeline.length > 0 ? "info" : "warning"
+          }
+        ]}
+      />
 
       <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="flex flex-col gap-6">
@@ -74,15 +95,15 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
                 <Badge>{record.confidence.score}% confidence</Badge>
                 <Badge>{record.confidence.band}</Badge>
               </div>
-              <p className="text-sm text-slate-700">
+              <p className="text-sm text-slate-700 dark:text-slate-300">
                 <span className="font-medium">Owner:</span> {record.owner ?? "unassigned"}
               </p>
               {record.reasoning !== null ? (
-                <p className="text-sm text-slate-700">
+                <p className="text-sm text-slate-700 dark:text-slate-300">
                   <span className="font-medium">Reasoning:</span> {record.reasoning}
                 </p>
               ) : null}
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
                 <p>Source: {record.provenance.sourceType}</p>
                 <p>Locator: {record.provenance.sourceLocator}</p>
                 <p>Method: {record.provenance.extractionMethod}</p>
@@ -96,18 +117,25 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
             </CardHeader>
             <CardContent className="space-y-3">
               {evidence.length === 0 ? (
-                <p className="text-sm text-slate-600">No evidence has been attached.</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  No evidence has been attached.
+                </p>
               ) : (
                 evidence.map((item) => (
-                  <div key={item.id} className="rounded-lg border border-slate-200 p-3">
+                  <div
+                    key={item.id}
+                    className="rounded-lg border border-slate-200 p-3 dark:border-slate-800"
+                  >
                     <div className="flex flex-wrap gap-2">
                       <Badge>{item.direction}</Badge>
                       <Badge>v{item.version}</Badge>
                       <Badge>{item.sourceType}</Badge>
                     </div>
-                    <p className="mt-2 text-sm font-medium text-slate-950">{item.sourceLocator}</p>
-                    <p className="text-xs text-slate-500">
-                      Observed {new Date(item.observedAt).toLocaleString()} ·{" "}
+                    <p className="mt-2 text-sm font-medium text-slate-950 dark:text-slate-100">
+                      {item.sourceLocator}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Observed {new Date(item.observedAt).toLocaleString()} -{" "}
                       {item.extractionMethod}
                     </p>
                   </div>
@@ -122,22 +150,29 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
             </CardHeader>
             <CardContent className="space-y-3">
               {corrections.length === 0 ? (
-                <p className="text-sm text-slate-600">No corrections have been requested.</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  No corrections have been requested.
+                </p>
               ) : (
                 corrections.map((correction) => (
-                  <div key={correction.id} className="rounded-lg border border-slate-200 p-3">
+                  <div
+                    key={correction.id}
+                    className="rounded-lg border border-slate-200 p-3 dark:border-slate-800"
+                  >
                     <div className="flex flex-wrap gap-2">
                       <Badge>{correction.status}</Badge>
                       <Badge>v{correction.version}</Badge>
                     </div>
-                    <p className="mt-2 text-sm text-slate-700">{correction.rationale}</p>
+                    <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">
+                      {correction.rationale}
+                    </p>
                     {correction.proposedClaim !== null ? (
-                      <p className="mt-2 text-sm text-slate-950">
+                      <p className="mt-2 text-sm text-slate-950 dark:text-slate-100">
                         Proposed claim: {correction.proposedClaim}
                       </p>
                     ) : null}
                     {correction.proposedLifecycle !== null ? (
-                      <p className="mt-1 text-sm text-slate-950">
+                      <p className="mt-1 text-sm text-slate-950 dark:text-slate-100">
                         Proposed lifecycle: {correction.proposedLifecycle}
                       </p>
                     ) : null}
@@ -181,9 +216,12 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
                   name="extractionMethod"
                   defaultValue="human-entered"
                 />
-                <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+                <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                   Direction
-                  <select name="direction" className="rounded-md border border-slate-300 px-3 py-2">
+                  <select
+                    name="direction"
+                    className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                  >
                     <option value="supports">Supports</option>
                     <option value="challenges">Challenges</option>
                   </select>
@@ -201,9 +239,12 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
               <form action={transitionMemoryLifecycleAction} className="flex flex-col gap-3">
                 <input name="organizationSlug" type="hidden" value={organizationSlug} />
                 <input name="memoryRecordId" type="hidden" value={memoryRecordId} />
-                <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+                <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                   New lifecycle
-                  <select name="lifecycle" className="rounded-md border border-slate-300 px-3 py-2">
+                  <select
+                    name="lifecycle"
+                    className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                  >
                     {lifecycleOptions.map((lifecycle) => (
                       <option key={lifecycle} value={lifecycle}>
                         {lifecycle}
@@ -225,26 +266,26 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
               <form action={createMemoryCorrectionAction} className="flex flex-col gap-3">
                 <input name="organizationSlug" type="hidden" value={organizationSlug} />
                 <input name="memoryRecordId" type="hidden" value={memoryRecordId} />
-                <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+                <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                   Rationale
                   <textarea
                     required
                     name="rationale"
-                    className="min-h-20 rounded-md border border-slate-300 px-3 py-2"
+                    className="min-h-20 rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </label>
-                <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+                <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                   Proposed claim
                   <textarea
                     name="proposedClaim"
-                    className="min-h-20 rounded-md border border-slate-300 px-3 py-2"
+                    className="min-h-20 rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </label>
-                <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+                <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                   Proposed lifecycle
                   <select
                     name="proposedLifecycle"
-                    className="rounded-md border border-slate-300 px-3 py-2"
+                    className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                   >
                     <option value="">No lifecycle change</option>
                     {lifecycleOptions.map((lifecycle) => (
@@ -271,10 +312,15 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
             </CardHeader>
             <CardContent className="space-y-2">
               {timeline.map((event) => (
-                <div key={event.id} className="rounded-md border border-slate-200 p-2">
-                  <p className="text-sm font-medium text-slate-900">{event.eventType}</p>
-                  <p className="text-xs text-slate-500">
-                    v{event.eventVersion} · {new Date(event.occurredAt).toLocaleString()}
+                <div
+                  key={event.id}
+                  className="rounded-md border border-slate-200 p-2 dark:border-slate-800"
+                >
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    {event.eventType}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    v{event.eventVersion} - {new Date(event.occurredAt).toLocaleString()}
                   </p>
                 </div>
               ))}
@@ -287,10 +333,15 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
             </CardHeader>
             <CardContent className="space-y-2">
               {versions.map((version) => (
-                <div key={version.id} className="rounded-md border border-slate-200 p-2">
-                  <p className="text-sm font-medium text-slate-900">Version {version.version}</p>
-                  <p className="text-xs text-slate-500">
-                    {version.changeReason} · {new Date(version.createdAt).toLocaleString()}
+                <div
+                  key={version.id}
+                  className="rounded-md border border-slate-200 p-2 dark:border-slate-800"
+                >
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    Version {version.version}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {version.changeReason} - {new Date(version.createdAt).toLocaleString()}
                   </p>
                 </div>
               ))}
@@ -298,13 +349,13 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
           </Card>
         </div>
       </section>
-    </main>
+    </AtlasShell>
   );
 }
 
 function Badge({ children }: Readonly<{ children: ReactNode }>): JSX.Element {
   return (
-    <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
+    <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 dark:bg-slate-900 dark:text-slate-300">
       {children}
     </span>
   );
@@ -324,14 +375,14 @@ function Input({
   type?: string;
 }>): JSX.Element {
   return (
-    <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+    <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
       {label}
       <input
         required={required}
         name={name}
         type={type}
         defaultValue={defaultValue}
-        className="rounded-md border border-slate-300 px-3 py-2"
+        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
       />
     </label>
   );
@@ -358,7 +409,7 @@ function CorrectionReviewForm({
         required
         name="rationale"
         placeholder={`${decision} rationale`}
-        className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
       />
       <Button type="submit" variant={decision === "apply" ? "primary" : "secondary"}>
         {decision === "apply" ? "Apply" : "Reject"}
