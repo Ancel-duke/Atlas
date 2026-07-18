@@ -1,10 +1,11 @@
-import { parseWebEnvironment } from "@atlas/config";
 import { authTokenResponseSchema, githubOAuthExchangeRequestSchema } from "@atlas/contracts";
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import { z } from "zod";
 
-const environment = parseWebEnvironment(process.env);
+import { getWebEnvironment } from "./lib/web-environment";
+
+const environment = getWebEnvironment();
 
 const githubProfileSchema = z.object({
   id: z.union([z.string(), z.number()]).transform(String),

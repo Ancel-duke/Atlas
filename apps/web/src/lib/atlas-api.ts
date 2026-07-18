@@ -1,13 +1,12 @@
-import { parseWebEnvironment } from "@atlas/config";
 import { authTokenResponseSchema } from "@atlas/contracts";
 import { AtlasSdk } from "@atlas/sdk";
 
 import { auth } from "../auth";
-
-const environment = parseWebEnvironment(process.env);
+import { getWebEnvironment } from "./web-environment";
 
 export async function createAuthenticatedAtlasSdk(): Promise<AtlasSdk> {
   const session = await auth();
+  const environment = getWebEnvironment();
 
   return new AtlasSdk({
     baseUrl: environment.NEXT_PUBLIC_ATLAS_API_URL,
