@@ -214,7 +214,7 @@ function GraphCanvas({
           <path
             d="M170 168 C290 70 420 76 515 158 S715 257 810 132"
             fill="none"
-            stroke="rgb(34 211 238 / 0.24)"
+            stroke="rgb(34 197 94 / 0.24)"
             strokeWidth="2"
           />
           <path
@@ -226,7 +226,7 @@ function GraphCanvas({
         </svg>
         <div className="relative grid min-h-[320px] content-between p-6">
           <div>
-            <p className="text-xs font-semibold uppercase text-cyan-200">Knowledge graph</p>
+            <p className="text-xs font-semibold uppercase text-green-200">Knowledge graph</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">Engineering topology</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
               Atlas renders only persisted graph entities here. Empty space means missing evidence,
@@ -259,7 +259,7 @@ function GraphNode({
 }): JSX.Element {
   const color =
     tone === "cyan"
-      ? "border-cyan-300/30 bg-cyan-300/10 text-cyan-100"
+      ? "border-green-300/30 bg-green-300/10 text-green-100"
       : tone === "violet"
         ? "border-violet-300/30 bg-violet-300/10 text-violet-100"
         : "border-emerald-300/30 bg-emerald-300/10 text-emerald-100";

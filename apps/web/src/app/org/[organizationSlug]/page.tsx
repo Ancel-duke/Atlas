@@ -242,8 +242,8 @@ function Metric({
   return (
     <Card className="atlas-hover">
       <CardContent className="flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-cyan-300/20 bg-cyan-300/10">
-          <Icon className="h-5 w-5 text-cyan-200" aria-hidden="true" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-green-300/20 bg-green-300/10">
+          <Icon className="h-5 w-5 text-green-200" aria-hidden="true" />
         </div>
         <div>
           <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
@@ -275,7 +275,7 @@ function ActionCard({
   return (
     <Card className="atlas-hover">
       <CardContent>
-        <Icon className="h-5 w-5 text-cyan-200" aria-hidden="true" />
+        <Icon className="h-5 w-5 text-green-200" aria-hidden="true" />
         <h2 className="mt-3 font-semibold text-slate-950 dark:text-slate-100">{title}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">{body}</p>
         <Button asChild className="mt-4" variant="secondary">

@@ -2,7 +2,7 @@ import type { JSX } from "react";
 
 export default function Loading(): JSX.Element {
   return (
-    <main className="atlas-grid min-h-screen px-5 py-8 text-slate-100">
+    <main className="atlas-grid min-h-dvh px-5 py-8 text-slate-100">
       <div className="mx-auto grid max-w-7xl gap-5">
         <div className="atlas-skeleton h-8 w-48 rounded-md" />
         <div className="atlas-skeleton h-20 max-w-3xl rounded-lg" />

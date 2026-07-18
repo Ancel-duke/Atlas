@@ -1,18 +1,4 @@
-import {
-  Activity,
-  BookOpen,
-  Bot,
-  Building2,
-  Database,
-  History,
-  Home,
-  Inbox,
-  Network,
-  Settings,
-  ShieldCheck,
-  Sparkles,
-  TerminalSquare
-} from "lucide-react";
+import { ShieldCheck, Sparkles, TerminalSquare } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import type { JSX, ReactNode } from "react";
@@ -20,6 +6,7 @@ import type { JSX, ReactNode } from "react";
 import { Badge, Button, cx } from "@atlas/ui";
 
 import { signOutAction } from "../app/actions";
+import { AtlasNavigation } from "./atlas-navigation";
 
 type AtlasShellProps = {
   readonly organizationSlug: string;
@@ -30,19 +17,6 @@ type AtlasShellProps = {
   readonly actions?: ReactNode;
 };
 
-const navItems = [
-  { label: "Dashboard", href: "", icon: Home },
-  { label: "Pulse", href: "/repositories", icon: Activity },
-  { label: "Graph", href: "/graph", icon: Network },
-  { label: "Chat", href: "/chat", icon: Bot },
-  { label: "Insights", href: "/insights", icon: Inbox },
-  { label: "Memory", href: "/memory", icon: BookOpen },
-  { label: "Evidence", href: "/evidence", icon: Database },
-  { label: "Timeline", href: "/timeline", icon: History },
-  { label: "Organization", href: "/settings/members", icon: Building2 },
-  { label: "Settings", href: "/settings", icon: Settings }
-] as const;
-
 export function AtlasShell({
   organizationSlug,
   title,
@@ -52,15 +26,21 @@ export function AtlasShell({
   children
 }: AtlasShellProps): JSX.Element {
   return (
-    <div className="atlas-grid min-h-screen overflow-hidden bg-[var(--atlas-bg)] text-slate-100">
-      <div className="mx-auto grid min-h-screen max-w-[1720px] lg:grid-cols-[284px_1fr]">
+    <div className="atlas-grid min-h-dvh overflow-hidden bg-[var(--atlas-bg)] text-slate-100">
+      <a
+        className="atlas-focus sr-only z-50 rounded-md bg-green-300 px-3 py-2 text-sm font-semibold text-slate-950 focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+        href="#main-content"
+      >
+        Skip to main content
+      </a>
+      <div className="mx-auto grid min-h-dvh max-w-[1720px] lg:grid-cols-[284px_1fr]">
         <aside className="relative z-20 border-b border-white/10 bg-slate-950/78 px-4 py-4 backdrop-blur-2xl lg:border-b-0 lg:border-r lg:px-5">
           <div className="flex items-center justify-between gap-3 lg:block">
             <Link
               className="atlas-focus group flex items-center gap-3 rounded-md"
               href={`/org/${organizationSlug}`}
             >
-              <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-cyan-300/25 bg-cyan-300 text-base font-black text-slate-950 shadow-[0_0_36px_rgb(34_211_238_/_0.24)] transition group-hover:scale-105">
+              <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-green-300/25 bg-green-300 text-base font-black text-slate-950 shadow-[0_0_36px_rgb(34_197_94_/_0.24)] transition group-hover:scale-105">
                 A
               </span>
               <span className="min-w-0">
@@ -77,7 +57,7 @@ export function AtlasShell({
 
           <div className="mt-5 hidden rounded-lg border border-white/10 bg-white/[0.04] p-3 lg:block">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-400">
-              <TerminalSquare className="h-4 w-4 text-cyan-200" aria-hidden="true" />
+              <TerminalSquare className="h-4 w-4 text-green-200" aria-hidden="true" />
               Engineering OS
             </div>
             <p className="mt-2 text-sm leading-6 text-slate-300">
@@ -85,28 +65,7 @@ export function AtlasShell({
             </p>
           </div>
 
-          <nav
-            aria-label="Primary"
-            className="atlas-stagger mt-5 flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0"
-          >
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  className="atlas-focus group relative inline-flex min-w-max items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition hover:border-white/10 hover:bg-white/[0.06] hover:text-white lg:min-w-0"
-                  href={`/org/${organizationSlug}${item.href}`}
-                  key={item.label}
-                >
-                  <span className="absolute left-0 h-5 w-0.5 rounded-r-full bg-cyan-300 opacity-0 transition group-hover:opacity-100" />
-                  <Icon
-                    className="h-4 w-4 transition group-hover:text-cyan-200"
-                    aria-hidden="true"
-                  />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
+          <AtlasNavigation organizationSlug={organizationSlug} />
 
           <form action={signOutAction} className="mt-6 hidden lg:block">
             <Button className="w-full" type="submit" variant="secondary">
@@ -119,7 +78,7 @@ export function AtlasShell({
           <header className="sticky top-0 z-10 border-b border-white/10 bg-slate-950/72 px-4 py-4 backdrop-blur-2xl sm:px-6 lg:px-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0">
-                <p className="flex items-center gap-2 text-xs font-semibold uppercase text-cyan-200">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase text-green-200">
                   <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                   {eyebrow}
                 </p>
@@ -136,7 +95,11 @@ export function AtlasShell({
             </div>
           </header>
 
-          <main className="atlas-enter flex flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+          <main
+            id="main-content"
+            className="atlas-enter flex flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8"
+            tabIndex={-1}
+          >
             {children}
           </main>
         </div>
@@ -158,7 +121,7 @@ export function PageIntro({
     <section className="atlas-panel-soft rounded-lg p-5">
       <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
-          <p className="text-xs font-semibold uppercase text-cyan-200">How Atlas knows</p>
+          <p className="text-xs font-semibold uppercase text-green-200">How Atlas knows</p>
           <h2 className="mt-2 text-xl font-semibold tracking-normal text-white">{title}</h2>
           <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-400 md:text-base md:leading-7">
             {body}
@@ -167,7 +130,7 @@ export function PageIntro({
         <div className="grid gap-2 sm:grid-cols-3 lg:min-w-[540px]">
           {facts.map((fact) => (
             <div
-              className="rounded-md border border-cyan-300/15 bg-cyan-300/[0.06] px-3 py-2 text-xs font-semibold text-cyan-100"
+              className="rounded-md border border-green-300/15 bg-green-300/[0.06] px-3 py-2 text-xs font-semibold text-green-100"
               key={fact}
             >
               {fact}
@@ -234,7 +197,7 @@ export function DemoEmptyState({
 }): JSX.Element {
   return (
     <div className="rounded-lg border border-dashed border-slate-700 bg-slate-950/55 p-5">
-      <Icon className="h-5 w-5 text-cyan-200" aria-hidden="true" />
+      <Icon className="h-5 w-5 text-green-200" aria-hidden="true" />
       <p className="mt-4 text-base font-semibold text-white">{title}</p>
       <p className="mt-2 text-sm leading-6 text-slate-400">{body}</p>
       <p className="mt-4 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-300">

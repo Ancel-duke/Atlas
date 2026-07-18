@@ -65,13 +65,13 @@ export default async function EngineeringChatPage({ params }: PageProps): Promis
         <Card className="overflow-hidden">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Bot className="h-4 w-4 text-cyan-200" aria-hidden="true" />
+              <Bot className="h-4 w-4 text-green-200" aria-hidden="true" />
               AI IDE assistant
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="mb-4 rounded-md border border-white/10 bg-slate-950/70 p-3 font-mono text-xs leading-6 text-slate-400">
-              <p className="text-cyan-200">atlas.reasoning.packageEvidence()</p>
+              <p className="text-green-200">atlas.reasoning.packageEvidence()</p>
               <p>context: repository | organization</p>
               <p>policy: no evidence, no conclusion</p>
             </div>

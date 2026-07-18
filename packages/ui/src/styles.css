@@ -13,13 +13,13 @@
   --atlas-text: #f8fafc;
   --atlas-muted: #94a3b8;
   --atlas-subtle: #64748b;
-  --atlas-cyan: #22d3ee;
+  --atlas-accent: #22c55e;
   --atlas-emerald: #34d399;
   --atlas-violet: #a78bfa;
   --atlas-amber: #fbbf24;
   --atlas-rose: #fb7185;
   --atlas-shadow: 0 24px 80px rgb(0 0 0 / 0.36);
-  --atlas-glow: 0 0 0 1px rgb(34 211 238 / 0.16), 0 18px 70px rgb(34 211 238 / 0.08);
+  --atlas-glow: 0 0 0 1px rgb(34 197 94 / 0.16), 0 18px 70px rgb(34 197 94 / 0.08);
 }
 
 html {
@@ -29,8 +29,8 @@ html {
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 18% -12%, rgb(34 211 238 / 0.16), transparent 28rem),
-    radial-gradient(circle at 82% 4%, rgb(167 139 250 / 0.12), transparent 30rem),
+    linear-gradient(110deg, rgb(34 197 94 / 0.1), transparent 28%),
+    linear-gradient(250deg, rgb(167 139 250 / 0.08), transparent 34%),
     linear-gradient(135deg, #05070d 0%, #070b13 48%, #020617 100%);
   color: var(--atlas-text);
 }
@@ -42,6 +42,7 @@ select,
 textarea,
 summary {
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 input,
@@ -96,11 +97,21 @@ textarea {
   outline: none;
 }
 
+.atlas-grid input:not([type="hidden"]),
+.atlas-grid select {
+  min-height: 44px;
+}
+
+.atlas-grid table,
+.atlas-grid [data-atlas-numeric="true"] {
+  font-variant-numeric: tabular-nums;
+}
+
 .atlas-grid input:not([type="hidden"]):focus,
 .atlas-grid select:focus,
 .atlas-grid textarea:focus {
-  border-color: rgb(34 211 238 / 0.55);
-  box-shadow: 0 0 0 2px rgb(34 211 238 / 0.18);
+  border-color: rgb(34 197 94 / 0.55);
+  box-shadow: 0 0 0 2px rgb(34 197 94 / 0.18);
 }
 
 .atlas-focus {
@@ -108,7 +119,7 @@ textarea {
 }
 
 .atlas-focus:focus-visible {
-  box-shadow: 0 0 0 2px rgb(34 211 238 / 0.65);
+  box-shadow: 0 0 0 2px rgb(34 197 94 / 0.65);
 }
 
 .atlas-panel {
@@ -137,6 +148,10 @@ textarea {
   transform: translateY(-2px);
   border-color: var(--atlas-border-strong);
   box-shadow: var(--atlas-glow);
+}
+
+.atlas-hover:active {
+  transform: translateY(0) scale(0.99);
 }
 
 .atlas-stagger > * {
@@ -185,7 +200,7 @@ details.atlas-disclosure {
 }
 
 details.atlas-disclosure[open] {
-  border-color: rgb(34 211 238 / 0.34);
+  border-color: rgb(34 197 94 / 0.34);
   background: rgb(8 13 23 / 0.78);
 }
 

@@ -15,7 +15,7 @@ export default async function SignInPage(): Promise<JSX.Element> {
   }
 
   return (
-    <main className="atlas-grid grid min-h-screen place-items-center px-5 py-8 text-slate-100">
+    <main className="atlas-grid grid min-h-dvh place-items-center px-5 py-8 text-slate-100">
       <section className="grid w-full max-w-6xl gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div className="atlas-enter">
           <Badge tone="success">
@@ -35,7 +35,7 @@ export default async function SignInPage(): Promise<JSX.Element> {
         <Card className="atlas-enter">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <ShieldCheck className="h-5 w-5 text-cyan-200" aria-hidden="true" />
+              <ShieldCheck className="h-5 w-5 text-green-200" aria-hidden="true" />
               Continue with GitHub
             </CardTitle>
           </CardHeader>
@@ -74,7 +74,7 @@ function AuthSignal({
   return (
     <div className="flex items-center justify-between gap-4 rounded-md border border-white/10 bg-white/[0.04] px-4 py-3">
       <div className="flex items-center gap-3">
-        <Icon className="h-4 w-4 text-cyan-200" aria-hidden="true" />
+        <Icon className="h-4 w-4 text-green-200" aria-hidden="true" />
         <span className="text-sm text-slate-400">{label}</span>
       </div>
       <span className="text-sm font-semibold text-white">{value}</span>

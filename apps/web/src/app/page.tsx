@@ -50,8 +50,8 @@ export default async function HomePage(): Promise<JSX.Element> {
   }
 
   return (
-    <main className="atlas-grid min-h-screen overflow-hidden px-5 py-6 text-slate-100 sm:px-8 lg:px-10">
-      <section className="mx-auto grid min-h-[calc(100vh-3rem)] max-w-7xl content-center gap-8">
+    <main className="atlas-grid min-h-dvh overflow-hidden px-5 py-6 text-slate-100 sm:px-8 lg:px-10">
+      <section className="mx-auto grid min-h-[calc(100dvh-3rem)] max-w-7xl content-center gap-8">
         <header className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
           <div className="atlas-enter">
             <Badge tone="info">
@@ -83,7 +83,7 @@ export default async function HomePage(): Promise<JSX.Element> {
             <CardContent className="p-0">
               <div className="border-b border-white/10 bg-white/[0.04] px-5 py-4">
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-200">
-                  <TerminalSquare className="h-4 w-4 text-cyan-200" aria-hidden="true" />
+                  <TerminalSquare className="h-4 w-4 text-green-200" aria-hidden="true" />
                   Launch readiness console
                 </div>
               </div>
@@ -157,7 +157,7 @@ function TrustPoint({
 }): JSX.Element {
   return (
     <article className="atlas-panel-soft atlas-hover rounded-lg p-5">
-      <Icon className="h-5 w-5 text-cyan-200" aria-hidden="true" />
+      <Icon className="h-5 w-5 text-green-200" aria-hidden="true" />
       <p className="mt-4 text-base font-semibold text-white">{title}</p>
       <p className="mt-2 text-sm leading-6 text-slate-400">{body}</p>
     </article>

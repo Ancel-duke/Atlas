@@ -123,7 +123,7 @@ export default async function RepositoryPulsePage({
               </Badge>
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase text-cyan-200">Explainable formula</p>
+              <p className="text-xs font-semibold uppercase text-green-200">Explainable formula</p>
               <h2 className="mt-2 text-2xl font-semibold text-white">Overall Health</h2>
               <p className="mt-3 text-sm leading-6 text-slate-400">
                 {assessment.overallExplanation}
@@ -234,7 +234,7 @@ function MetricCard({
   return (
     <Card className="atlas-hover">
       <CardContent className="flex items-center gap-3">
-        <Icon className="h-5 w-5 text-cyan-200" aria-hidden="true" />
+        <Icon className="h-5 w-5 text-green-200" aria-hidden="true" />
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase text-slate-500">{label}</p>
           <p className="truncate text-sm font-medium text-slate-950">{value}</p>
@@ -346,7 +346,7 @@ function PulseGauge({
           cy="60"
           fill="none"
           r="52"
-          stroke={status === "calculated" ? "rgb(34 211 238)" : "rgb(251 191 36)"}
+          stroke={status === "calculated" ? "rgb(34 197 94)" : "rgb(251 191 36)"}
           strokeDasharray={circumference}
           strokeDashoffset={dashOffset}
           strokeLinecap="round"
@@ -397,18 +397,27 @@ function TrendChart({ assessment }: { readonly assessment: PulseAssessment }): J
     .map((score, index) => `${index * step},${height - (score / 100) * height}`)
     .join(" ");
 
+  const summary =
+    plotted.length <= 1
+      ? "Trend needs at least two scored assessments before Atlas can show direction."
+      : `${plotted.length} Pulse scores plotted. Direction: ${assessment.trend.direction}.`;
+
   return (
-    <svg
-      aria-label="Repository Pulse trend chart"
-      className="h-28 w-full rounded-md border border-slate-200 bg-white"
-      preserveAspectRatio="none"
-      viewBox={`0 0 ${width} ${height}`}
-    >
-      <line x1="0" x2={width} y1="30" y2="30" stroke="#e2e8f0" />
-      <line x1="0" x2={width} y1="60" y2="60" stroke="#e2e8f0" />
-      <line x1="0" x2={width} y1="90" y2="90" stroke="#e2e8f0" />
-      <polyline fill="none" points={polyline} stroke="#10b981" strokeWidth="4" />
-    </svg>
+    <figure>
+      <svg
+        aria-label={summary}
+        className="h-28 w-full rounded-md border border-slate-200 bg-white"
+        preserveAspectRatio="none"
+        role="img"
+        viewBox={`0 0 ${width} ${height}`}
+      >
+        <line x1="0" x2={width} y1="30" y2="30" stroke="#334155" />
+        <line x1="0" x2={width} y1="60" y2="60" stroke="#334155" />
+        <line x1="0" x2={width} y1="90" y2="90" stroke="#334155" />
+        <polyline fill="none" points={polyline} stroke="#22c55e" strokeWidth="4" />
+      </svg>
+      <figcaption className="mt-2 text-xs leading-5 text-slate-500">{summary}</figcaption>
+    </figure>
   );
 }
 

@@ -2,7 +2,7 @@ import type { JSX } from "react";
 
 export default function OrganizationLoading(): JSX.Element {
   return (
-    <main className="atlas-grid min-h-screen px-5 py-6 text-slate-100 sm:px-8">
+    <main className="atlas-grid min-h-dvh px-5 py-6 text-slate-100 sm:px-8">
       <div className="grid gap-6 lg:grid-cols-[284px_1fr]">
         <aside className="hidden rounded-lg border border-white/10 bg-slate-950/70 p-5 lg:block">
           <div className="atlas-skeleton h-11 w-40 rounded-lg" />

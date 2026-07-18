@@ -355,7 +355,7 @@ export default async function MemoryRecordPage(props: MemoryRecordPageProps): Pr
 
 function Badge({ children }: Readonly<{ children: ReactNode }>): JSX.Element {
   return (
-    <span className="rounded-md border border-cyan-300/20 bg-cyan-300/10 px-2 py-1 text-xs font-semibold text-cyan-100">
+    <span className="rounded-md border border-green-300/20 bg-green-300/10 px-2 py-1 text-xs font-semibold text-green-100">
       {children}
     </span>
   );
