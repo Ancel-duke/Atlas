@@ -73,14 +73,21 @@ services:
     build:
       context: .
       dockerfile: infrastructure/docker/web.Dockerfile
+      args:
+        ATLAS_INTERNAL_API_SECRET: ${ATLAS_INTERNAL_API_SECRET:?ATLAS_INTERNAL_API_SECRET is required}
+        AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET is required}
+        AUTH_URL: ${AUTH_URL:-http://localhost:3000}
+        AUTH_GITHUB_ID: ${AUTH_GITHUB_ID:?AUTH_GITHUB_ID is required}
+        AUTH_GITHUB_SECRET: ${AUTH_GITHUB_SECRET:?AUTH_GITHUB_SECRET is required}
+        NEXT_PUBLIC_ATLAS_API_URL: ${NEXT_PUBLIC_ATLAS_API_URL:-http://localhost:4000}
     environment:
       ATLAS_ENVIRONMENT: local
-      ATLAS_INTERNAL_API_SECRET: local-internal-secret-with-at-least-thirty-two-chars
-      AUTH_SECRET: local-secret-value-with-at-least-thirty-two-chars
-      AUTH_URL: http://localhost:3000
-      AUTH_GITHUB_ID: ${AUTH_GITHUB_ID:-replace-with-github-oauth-client-id}
-      AUTH_GITHUB_SECRET: ${AUTH_GITHUB_SECRET:-replace-with-github-oauth-client-secret}
-      NEXT_PUBLIC_ATLAS_API_URL: http://localhost:4000
+      ATLAS_INTERNAL_API_SECRET: ${ATLAS_INTERNAL_API_SECRET:?ATLAS_INTERNAL_API_SECRET is required}
+      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET is required}
+      AUTH_URL: ${AUTH_URL:-http://localhost:3000}
+      AUTH_GITHUB_ID: ${AUTH_GITHUB_ID:?AUTH_GITHUB_ID is required}
+      AUTH_GITHUB_SECRET: ${AUTH_GITHUB_SECRET:?AUTH_GITHUB_SECRET is required}
+      NEXT_PUBLIC_ATLAS_API_URL: ${NEXT_PUBLIC_ATLAS_API_URL:-http://localhost:4000}
     ports:
       - "3000:3000"
     depends_on:

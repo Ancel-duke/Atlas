@@ -7,7 +7,7 @@ import { Badge, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
 
 import {
   AtlasShell,
-  DemoEmptyState,
+  EvidenceEmptyState,
   PageIntro,
   TrustStrip
 } from "../../../../components/atlas-shell";
@@ -74,7 +74,7 @@ export default async function EvidenceViewerPage({ params }: PageProps): Promise
         </CardHeader>
         <CardContent className="space-y-3">
           {evidenceItems.length === 0 ? (
-            <DemoEmptyState
+            <EvidenceEmptyState
               icon={Database}
               title="No evidence yet"
               body="Atlas should not ask for trust before it has source-backed evidence items."

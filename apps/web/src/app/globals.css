@@ -2,8 +2,8 @@
 
 body {
   margin: 0;
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--atlas-bg);
+  color: var(--atlas-text);
   font-family:
     Inter,
     ui-sans-serif,
@@ -19,20 +19,8 @@ a {
 }
 
 ::selection {
-  background: #99f6e4;
-  color: #042f2e;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #020617;
-    color: #e2e8f0;
-  }
-
-  ::selection {
-    background: #115e59;
-    color: #f8fafc;
-  }
+  background: rgb(34 197 94 / 0.3);
+  color: #f8fafc;
 }
 
 @keyframes atlas-enter {

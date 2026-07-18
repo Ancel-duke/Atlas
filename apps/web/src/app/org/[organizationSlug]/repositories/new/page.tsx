@@ -27,7 +27,7 @@ export default async function RepositoryOnboardingPage({
     >
       <PageIntro
         title="Atlas needs stable repository identity before it reasons."
-        body="The demo works best when the provider repository ID is the immutable GitHub numeric repository ID. The display name can change later; the provider ID is what keeps webhook events and historical evidence tied together."
+        body="Use the immutable GitHub numeric repository ID when possible. The display name can change later; the provider ID is what keeps webhook events and historical evidence tied together."
         facts={[
           "Stable ID for correlation",
           "Display name can be renamed",
@@ -54,13 +54,13 @@ export default async function RepositoryOnboardingPage({
               <Field
                 label="Repository name"
                 name="name"
-                placeholder="openai/atlas-api"
+                placeholder="owner/repository"
                 help="Human-readable GitHub owner/name shown throughout Atlas. This can be updated if the repository is renamed."
               />
               <Field
                 label="Provider repository ID"
                 name="providerRepositoryId"
-                placeholder="123456789"
+                placeholder="GitHub numeric repository ID"
                 help="Prefer the immutable numeric GitHub repository ID. Atlas uses it to match signed webhook deliveries."
               />
               <Field

@@ -7,7 +7,7 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@atlas/
 
 import {
   AtlasShell,
-  DemoEmptyState,
+  EvidenceEmptyState,
   PageIntro,
   TrustStrip
 } from "../../../../components/atlas-shell";
@@ -84,7 +84,7 @@ export default async function EngineeringMemoryPage(props: MemoryPageProps): Pro
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             {records.length === 0 ? (
-              <DemoEmptyState
+              <EvidenceEmptyState
                 icon={BookOpen}
                 title="No memory records yet"
                 body="Atlas cannot build organizational memory until someone records a fact, decision, or recommendation with confidence."

@@ -10,14 +10,22 @@ import {
   Truck,
   Users
 } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { JSX } from "react";
 
 import type { PulseAssessment, PulseDimension, PulseEvidence } from "@atlas/contracts";
 import { AtlasSdkError } from "@atlas/sdk";
-import { Button, Card, CardContent, CardHeader, CardTitle, cx } from "@atlas/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, cx } from "@atlas/ui";
 
-import { AtlasShell, PageIntro, TrustStrip } from "../../../../../../components/atlas-shell";
+import { calculateRepositoryPulseAction } from "../../../../../actions";
+import { AnimatedNumber } from "../../../../../../components/animated-number";
+import {
+  AtlasShell,
+  EvidenceDisclosure,
+  PageIntro,
+  TrustStrip
+} from "../../../../../../components/atlas-shell";
 import { createAuthenticatedAtlasSdk, requireAtlasSession } from "../../../../../../lib/atlas-api";
 
 type PulseRouteParams = {
@@ -68,6 +76,16 @@ export default async function RepositoryPulsePage({
       description={`Formula ${assessment.formulaVersion} calculated at ${new Date(
         assessment.calculatedAt
       ).toLocaleString()}. Every score exposes inputs, weights, contribution, evidence, and gaps.`}
+      actions={
+        <form action={calculateRepositoryPulseAction}>
+          <input name="organizationSlug" type="hidden" value={routeParams.organizationSlug} />
+          <input name="repositoryId" type="hidden" value={routeParams.repositoryId} />
+          <Button type="submit">
+            <Activity className="h-4 w-4" aria-hidden="true" />
+            Recalculate Pulse
+          </Button>
+        </form>
+      }
     >
       <PageIntro
         title="Pulse is explainable repository health."
@@ -98,29 +116,17 @@ export default async function RepositoryPulsePage({
 
       <section className="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
         <Card>
-          <CardContent className="grid gap-5 md:grid-cols-[220px_1fr]">
-            <div>
-              <p className="text-xs font-medium uppercase text-slate-500">Overall Health</p>
-              <div className="mt-3 flex items-end gap-2">
-                <span className="text-5xl font-semibold text-slate-950">
-                  {assessment.overallScore ?? "--"}
-                </span>
-                <span className="pb-2 text-sm text-slate-500">/ 100</span>
-              </div>
-              <p
-                className={cx(
-                  "mt-3 inline-flex rounded-md px-2 py-1 text-xs font-medium",
-                  assessment.status === "calculated"
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-amber-50 text-amber-700"
-                )}
-              >
+          <CardContent className="grid gap-7 md:grid-cols-[260px_1fr] md:items-center">
+            <div className="grid justify-items-center gap-4">
+              <PulseGauge score={assessment.overallScore} status={assessment.status} />
+              <Badge tone={assessment.status === "calculated" ? "success" : "warning"}>
                 {assessment.status === "calculated" ? "Calculated" : "Insufficient evidence"}
-              </p>
+              </Badge>
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-slate-900">Calculation</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
+              <p className="text-xs font-semibold uppercase text-green-200">Explainable formula</p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">Overall Health</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-400">
                 {assessment.overallExplanation}
               </p>
               <div className="mt-4">
@@ -193,31 +199,27 @@ function PulseUnavailable({
   readonly repositoryId: string;
 }): JSX.Element {
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 px-6 py-8">
-      <header className="border-b border-slate-200 pb-5">
-        <p className="text-sm font-medium text-slate-500">
-          {organizationSlug} / {repositoryId}
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-normal text-slate-950">
-          Repository Pulse
-        </h1>
-      </header>
+    <AtlasShell
+      organizationSlug={organizationSlug}
+      title="Repository Pulse"
+      eyebrow={repositoryId}
+      description="Pulse only calculates from persisted Atlas repository, graph, memory, insight, and snapshot evidence."
+    >
       <Card>
         <CardContent className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-600" aria-hidden="true" />
+          <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-200" aria-hidden="true" />
           <div>
             <p className="font-medium text-slate-950">Repository not found</p>
             <p className="mt-1 text-sm text-slate-600">
-              Pulse only calculates from persisted Atlas repository, graph, memory, insight, and
-              snapshot evidence.
+              Atlas could not locate this repository in the active organization context.
             </p>
             <Button asChild className="mt-4" variant="secondary">
-              <a href={`/org/${organizationSlug}`}>Back to organization</a>
+              <Link href={`/org/${organizationSlug}`}>Back to organization</Link>
             </Button>
           </div>
         </CardContent>
       </Card>
-    </main>
+    </AtlasShell>
   );
 }
 
@@ -231,9 +233,9 @@ function MetricCard({
   readonly value: string;
 }): JSX.Element {
   return (
-    <Card>
+    <Card className="atlas-hover">
       <CardContent className="flex items-center gap-3">
-        <Icon className="h-5 w-5 text-slate-600" aria-hidden="true" />
+        <Icon className="h-5 w-5 text-green-200" aria-hidden="true" />
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase text-slate-500">{label}</p>
           <p className="truncate text-sm font-medium text-slate-950">{value}</p>
@@ -296,9 +298,8 @@ function DimensionPanel({
             </tbody>
           </table>
         </div>
-        <details className="rounded-md border border-slate-200 p-3">
-          <summary className="cursor-pointer text-sm font-medium text-slate-900">Evidence</summary>
-          <div className="mt-3 flex flex-col gap-2">
+        <EvidenceDisclosure title="Evidence">
+          <div className="flex flex-col gap-2">
             {dimension.evidenceIds.length === 0 ? (
               <p className="text-sm text-slate-600">No evidence for this dimension.</p>
             ) : (
@@ -313,9 +314,54 @@ function DimensionPanel({
               })
             )}
           </div>
-        </details>
+        </EvidenceDisclosure>
       </CardContent>
     </Card>
+  );
+}
+
+function PulseGauge({
+  score,
+  status
+}: {
+  readonly score: number | null;
+  readonly status: PulseAssessment["status"];
+}): JSX.Element {
+  const safeScore = Math.max(0, Math.min(score ?? 0, 100));
+  const circumference = 2 * Math.PI * 52;
+  const dashOffset = circumference - (safeScore / 100) * circumference;
+
+  return (
+    <div className="atlas-pulse-gauge relative grid h-56 w-56 place-items-center rounded-full border border-white/10 bg-slate-950/70">
+      <svg className="absolute h-48 w-48 -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
+        <circle
+          cx="60"
+          cy="60"
+          fill="none"
+          r="52"
+          stroke="rgb(148 163 184 / 0.14)"
+          strokeWidth="10"
+        />
+        <circle
+          cx="60"
+          cy="60"
+          fill="none"
+          r="52"
+          stroke={status === "calculated" ? "rgb(34 197 94)" : "rgb(251 191 36)"}
+          strokeDasharray={circumference}
+          strokeDashoffset={dashOffset}
+          strokeLinecap="round"
+          strokeWidth="10"
+        />
+      </svg>
+      <div className="text-center">
+        <p className="text-xs font-semibold uppercase text-slate-500">Pulse</p>
+        <p className="mt-1 text-5xl font-semibold text-white">
+          {score === null ? "--" : <AnimatedNumber value={safeScore} />}
+        </p>
+        <p className="mt-1 text-sm text-slate-500">/ 100</p>
+      </div>
+    </div>
   );
 }
 
@@ -352,34 +398,40 @@ function TrendChart({ assessment }: { readonly assessment: PulseAssessment }): J
     .map((score, index) => `${index * step},${height - (score / 100) * height}`)
     .join(" ");
 
+  const summary =
+    plotted.length <= 1
+      ? "Trend needs at least two scored assessments before Atlas can show direction."
+      : `${plotted.length} Pulse scores plotted. Direction: ${assessment.trend.direction}.`;
+
   return (
-    <svg
-      aria-label="Repository Pulse trend chart"
-      className="h-28 w-full rounded-md border border-slate-200 bg-white"
-      preserveAspectRatio="none"
-      viewBox={`0 0 ${width} ${height}`}
-    >
-      <line x1="0" x2={width} y1="30" y2="30" stroke="#e2e8f0" />
-      <line x1="0" x2={width} y1="60" y2="60" stroke="#e2e8f0" />
-      <line x1="0" x2={width} y1="90" y2="90" stroke="#e2e8f0" />
-      <polyline fill="none" points={polyline} stroke="#10b981" strokeWidth="4" />
-    </svg>
+    <figure>
+      <svg
+        aria-label={summary}
+        className="h-28 w-full rounded-md border border-slate-200 bg-white"
+        preserveAspectRatio="none"
+        role="img"
+        viewBox={`0 0 ${width} ${height}`}
+      >
+        <line x1="0" x2={width} y1="30" y2="30" stroke="#334155" />
+        <line x1="0" x2={width} y1="60" y2="60" stroke="#334155" />
+        <line x1="0" x2={width} y1="90" y2="90" stroke="#334155" />
+        <polyline fill="none" points={polyline} stroke="#22c55e" strokeWidth="4" />
+      </svg>
+      <figcaption className="mt-2 text-xs leading-5 text-slate-500">{summary}</figcaption>
+    </figure>
   );
 }
 
 function EvidenceRow({ evidence }: { readonly evidence: PulseEvidence }): JSX.Element {
   return (
-    <details className="rounded-md border border-slate-200 p-3">
-      <summary className="cursor-pointer text-sm font-medium text-slate-900">
-        {evidence.label}
-      </summary>
+    <EvidenceDisclosure title={evidence.label}>
       <dl className="mt-3 grid gap-2 text-sm">
         <Fact label="ID" value={evidence.id} />
         <Fact label="Source" value={`${evidence.sourceType}:${evidence.sourceLocator}`} />
         <Fact label="Observed" value={new Date(evidence.observedAt).toLocaleString()} />
       </dl>
       <p className="mt-3 text-sm leading-6 text-slate-600">{evidence.summary}</p>
-    </details>
+    </EvidenceDisclosure>
   );
 }
 

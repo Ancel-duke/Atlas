@@ -12,13 +12,12 @@ export function Badge({ className, tone = "neutral", ...props }: BadgeProps): JS
   return (
     <span
       className={cx(
-        "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium",
-        tone === "neutral" && "bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-300",
-        tone === "success" &&
-          "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
-        tone === "warning" && "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
-        tone === "danger" && "bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300",
-        tone === "info" && "bg-cyan-50 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-300",
+        "inline-flex items-center rounded-md border px-2 py-1 text-xs font-semibold",
+        tone === "neutral" && "border-slate-700/70 bg-slate-900/80 text-slate-300",
+        tone === "success" && "border-emerald-400/25 bg-emerald-400/10 text-emerald-200",
+        tone === "warning" && "border-amber-400/25 bg-amber-400/10 text-amber-200",
+        tone === "danger" && "border-rose-400/25 bg-rose-400/10 text-rose-200",
+        tone === "info" && "border-cyan-400/25 bg-cyan-400/10 text-cyan-200",
         className
       )}
       {...props}

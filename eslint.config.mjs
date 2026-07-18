@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import nextPlugin from "@next/eslint-plugin-next";
 import eslintConfigPrettier from "eslint-config-prettier";
 import tseslint from "typescript-eslint";
 
@@ -15,6 +16,11 @@ export default tseslint.config(
   },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
+  {
+    plugins: {
+      "@next/next": nextPlugin
+    }
+  },
   {
     languageOptions: {
       parserOptions: {
@@ -37,6 +43,18 @@ export default tseslint.config(
   {
     files: ["**/*.js", "**/*.mjs", "**/*.cjs"],
     ...tseslint.configs.disableTypeChecked
+  },
+  {
+    files: ["apps/web/src/**/*.{ts,tsx}"],
+    rules: {
+      ...nextPlugin.flatConfig.coreWebVitals.rules,
+      "@next/next/no-html-link-for-pages": "off"
+    },
+    settings: {
+      next: {
+        rootDir: "apps/web"
+      }
+    }
   },
   {
     files: ["scripts/**/*.mjs"],
