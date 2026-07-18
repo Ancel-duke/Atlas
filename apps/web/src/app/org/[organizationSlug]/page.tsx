@@ -5,6 +5,7 @@ import type { JSX } from "react";
 
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
 
+import { AnimatedNumber } from "../../../components/animated-number";
 import {
   AtlasShell,
   DemoEmptyState,
@@ -94,26 +95,26 @@ export default async function OrganizationPage(props: OrganizationPageProps): Pr
         <Metric
           icon={GitBranch}
           label="Repositories"
-          value={repositories.length.toString()}
+          value={repositories.length}
           detail={`${activeRepositories.length} connected`}
         />
         <Metric
           icon={Inbox}
           label="Open insights"
-          value={openInsights.length.toString()}
+          value={openInsights.length}
           detail={`${criticalInsights.length} critical`}
           tone={criticalInsights.length > 0 ? "danger" : "success"}
         />
         <Metric
           icon={BookOpen}
           label="Memory records"
-          value={memoryRecords.length.toString()}
+          value={memoryRecords.length}
           detail="facts, decisions, recommendations"
         />
         <Metric
           icon={Network}
           label="Graph entities"
-          value={graphEntities.length.toString()}
+          value={graphEntities.length}
           detail="repository knowledge graph"
         />
       </section>
@@ -234,21 +235,23 @@ function Metric({
 }: {
   readonly icon: typeof Activity;
   readonly label: string;
-  readonly value: string;
+  readonly value: number;
   readonly detail: string;
   readonly tone?: "success" | "danger" | "info";
 }): JSX.Element {
   return (
-    <Card>
+    <Card className="atlas-hover">
       <CardContent className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-900">
-          <Icon className="h-5 w-5 text-slate-700 dark:text-slate-300" aria-hidden="true" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-cyan-300/20 bg-cyan-300/10">
+          <Icon className="h-5 w-5 text-cyan-200" aria-hidden="true" />
         </div>
         <div>
-          <p className="text-xs font-medium uppercase text-slate-500 dark:text-slate-400">
+          <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
             {label}
           </p>
-          <p className="text-2xl font-semibold text-slate-950 dark:text-slate-100">{value}</p>
+          <p className="text-3xl font-semibold text-white">
+            <AnimatedNumber value={value} />
+          </p>
           <Badge tone={tone} className="mt-1">
             {detail}
           </Badge>
@@ -270,9 +273,9 @@ function ActionCard({
   readonly href: string;
 }): JSX.Element {
   return (
-    <Card className="transition hover:-translate-y-0.5 hover:border-slate-400 dark:hover:border-slate-600">
+    <Card className="atlas-hover">
       <CardContent>
-        <Icon className="h-5 w-5 text-emerald-600 dark:text-emerald-300" aria-hidden="true" />
+        <Icon className="h-5 w-5 text-cyan-200" aria-hidden="true" />
         <h2 className="mt-3 font-semibold text-slate-950 dark:text-slate-100">{title}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">{body}</p>
         <Button asChild className="mt-4" variant="secondary">

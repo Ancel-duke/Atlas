@@ -7,6 +7,7 @@ import { Badge, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
 import {
   AtlasShell,
   DemoEmptyState,
+  EvidenceDisclosure,
   PageIntro,
   TrustStrip
 } from "../../../../components/atlas-shell";
@@ -135,8 +136,7 @@ export default async function InsightFeedPage({
                   <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
                     {insight.recommendedAction}
                   </p>
-                  <details className="mt-3 rounded-md bg-slate-50 p-3 dark:bg-slate-900">
-                    <summary className="cursor-pointer text-sm font-medium">Explainability</summary>
+                  <EvidenceDisclosure className="mt-3" title="Explainability">
                     <div className="mt-3 grid gap-3 text-sm text-slate-600 dark:text-slate-400">
                       <p>Confidence method: {insight.confidence.method}</p>
                       <p>
@@ -147,7 +147,7 @@ export default async function InsightFeedPage({
                       </p>
                       <p>Evidence entries: {insight.evidenceSet.length}</p>
                     </div>
-                  </details>
+                  </EvidenceDisclosure>
                 </article>
               ))
             )}

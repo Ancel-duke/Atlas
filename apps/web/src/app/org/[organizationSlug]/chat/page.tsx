@@ -8,6 +8,7 @@ import { createReasoningRunAction } from "../../../actions";
 import {
   AtlasShell,
   DemoEmptyState,
+  EvidenceDisclosure,
   PageIntro,
   TrustStrip
 } from "../../../../components/atlas-shell";
@@ -61,11 +62,19 @@ export default async function EngineeringChatPage({ params }: PageProps): Promis
       />
 
       <section className="grid gap-5 xl:grid-cols-[420px_1fr]">
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader>
-            <CardTitle>Ask with evidence packaging</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Bot className="h-4 w-4 text-cyan-200" aria-hidden="true" />
+              AI IDE assistant
+            </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="mb-4 rounded-md border border-white/10 bg-slate-950/70 p-3 font-mono text-xs leading-6 text-slate-400">
+              <p className="text-cyan-200">atlas.reasoning.packageEvidence()</p>
+              <p>context: repository | organization</p>
+              <p>policy: no evidence, no conclusion</p>
+            </div>
             <form action={createReasoningRunAction} className="grid gap-4">
               <input name="organizationSlug" type="hidden" value={organizationSlug} />
               <label className="grid gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -86,7 +95,7 @@ export default async function EngineeringChatPage({ params }: PageProps): Promis
                 Question
                 <textarea
                   required
-                  className="min-h-36 rounded-md border border-slate-300 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-950"
+                  className="min-h-40 rounded-md border border-slate-300 bg-white px-3 py-2 font-mono text-sm dark:border-slate-700 dark:bg-slate-950"
                   maxLength={2000}
                   minLength={3}
                   name="question"
@@ -130,10 +139,7 @@ export default async function EngineeringChatPage({ params }: PageProps): Promis
                   <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                     {new Date(run.createdAt).toLocaleString()}
                   </p>
-                  <details className="mt-3 rounded-md bg-slate-50 p-3 dark:bg-slate-900">
-                    <summary className="cursor-pointer text-sm font-medium">
-                      Evidence and prompts
-                    </summary>
+                  <EvidenceDisclosure className="mt-3" title="Evidence and prompts">
                     <div className="mt-3 grid gap-2">
                       {run.prompts.map((prompt) => (
                         <div className="flex items-center gap-2 text-sm" key={prompt.role}>
@@ -142,8 +148,11 @@ export default async function EngineeringChatPage({ params }: PageProps): Promis
                           <span className="text-slate-500">{prompt.promptVersion}</span>
                         </div>
                       ))}
+                      <div className="rounded-md border border-white/10 bg-white/[0.035] p-3 text-sm text-slate-400">
+                        Evidence packaged: {run.evidencePackage.evidence.length}
+                      </div>
                     </div>
-                  </details>
+                  </EvidenceDisclosure>
                 </article>
               ))
             )}

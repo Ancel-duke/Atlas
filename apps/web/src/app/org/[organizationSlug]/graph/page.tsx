@@ -7,6 +7,7 @@ import { Badge, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
 import {
   AtlasShell,
   DemoEmptyState,
+  EvidenceDisclosure,
   PageIntro,
   TrustStrip
 } from "../../../../components/atlas-shell";
@@ -102,6 +103,12 @@ export default async function GraphExplorerPage({
         </Card>
 
         <div className="grid gap-5">
+          <GraphCanvas
+            entityCount={entities.length}
+            entityTypes={entityTypes}
+            projectionCount={projections.length}
+          />
+
           <Card>
             <CardHeader>
               <CardTitle>Entities</CardTitle>
@@ -135,8 +142,7 @@ export default async function GraphExplorerPage({
                     <p className="mt-1 break-all text-sm text-slate-500 dark:text-slate-400">
                       {entity.canonicalKey}
                     </p>
-                    <details className="mt-3 rounded-md bg-slate-50 p-3 text-sm dark:bg-slate-900">
-                      <summary className="cursor-pointer font-medium">Provenance</summary>
+                    <EvidenceDisclosure className="mt-3" title="Provenance">
                       <dl className="mt-2 grid gap-1 text-slate-600 dark:text-slate-400">
                         <div>Source: {entity.provenance.sourceType}</div>
                         <div>Locator: {entity.provenance.sourceLocator}</div>
@@ -144,7 +150,7 @@ export default async function GraphExplorerPage({
                           Observed: {new Date(entity.provenance.observedAt).toLocaleString()}
                         </div>
                       </dl>
-                    </details>
+                    </EvidenceDisclosure>
                   </article>
                 ))
               )}
@@ -186,5 +192,82 @@ export default async function GraphExplorerPage({
         </div>
       </section>
     </AtlasShell>
+  );
+}
+
+function GraphCanvas({
+  entityCount,
+  entityTypes,
+  projectionCount
+}: {
+  readonly entityCount: number;
+  readonly entityTypes: readonly string[];
+  readonly projectionCount: number;
+}): JSX.Element {
+  const visibleTypes = entityTypes.slice(0, 6);
+
+  return (
+    <Card className="overflow-hidden">
+      <CardContent className="relative min-h-[320px] p-0">
+        <div className="absolute inset-0 atlas-grid opacity-60" />
+        <svg className="absolute inset-0 h-full w-full" aria-hidden="true" viewBox="0 0 900 320">
+          <path
+            d="M170 168 C290 70 420 76 515 158 S715 257 810 132"
+            fill="none"
+            stroke="rgb(34 211 238 / 0.24)"
+            strokeWidth="2"
+          />
+          <path
+            d="M150 224 C290 250 405 196 520 220 S725 205 780 252"
+            fill="none"
+            stroke="rgb(167 139 250 / 0.22)"
+            strokeWidth="2"
+          />
+        </svg>
+        <div className="relative grid min-h-[320px] content-between p-6">
+          <div>
+            <p className="text-xs font-semibold uppercase text-cyan-200">Knowledge graph</p>
+            <h2 className="mt-2 text-2xl font-semibold text-white">Engineering topology</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+              Atlas renders only persisted graph entities here. Empty space means missing evidence,
+              not an invented architecture map.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <GraphNode label="Entities" value={entityCount.toString()} tone="cyan" />
+            <GraphNode
+              label="Types"
+              value={visibleTypes.length === 0 ? "None" : visibleTypes.join(", ")}
+              tone="violet"
+            />
+            <GraphNode label="Projections" value={projectionCount.toString()} tone="emerald" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function GraphNode({
+  label,
+  value,
+  tone
+}: {
+  readonly label: string;
+  readonly value: string;
+  readonly tone: "cyan" | "violet" | "emerald";
+}): JSX.Element {
+  const color =
+    tone === "cyan"
+      ? "border-cyan-300/30 bg-cyan-300/10 text-cyan-100"
+      : tone === "violet"
+        ? "border-violet-300/30 bg-violet-300/10 text-violet-100"
+        : "border-emerald-300/30 bg-emerald-300/10 text-emerald-100";
+
+  return (
+    <div className={`rounded-lg border px-4 py-3 backdrop-blur ${color}`}>
+      <p className="text-xs font-semibold uppercase opacity-75">{label}</p>
+      <p className="mt-2 truncate text-sm font-semibold">{value}</p>
+    </div>
   );
 }

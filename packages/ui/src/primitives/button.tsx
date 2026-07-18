@@ -20,13 +20,12 @@ export function Button({
   return (
     <Component
       className={cx(
-        "inline-flex h-9 items-center justify-center gap-2 rounded-md px-3 text-sm font-medium outline-none transition focus-visible:ring-2 focus-visible:ring-slate-900 disabled:cursor-not-allowed disabled:opacity-60",
+        "atlas-focus inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold outline-none transition disabled:cursor-not-allowed disabled:opacity-60",
         variant === "primary" &&
-          "bg-slate-950 text-white hover:bg-slate-800 dark:bg-emerald-400 dark:text-slate-950 dark:hover:bg-emerald-300",
+          "bg-cyan-300 text-slate-950 shadow-[0_0_28px_rgb(34_211_238_/_0.22)] hover:bg-cyan-200",
         variant === "secondary" &&
-          "border border-slate-300 bg-white text-slate-950 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900",
-        variant === "ghost" &&
-          "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900",
+          "border border-slate-700/80 bg-white/[0.06] text-slate-100 hover:border-cyan-300/50 hover:bg-white/[0.1]",
+        variant === "ghost" && "text-slate-300 hover:bg-white/[0.07] hover:text-white",
         className
       )}
       type={type}

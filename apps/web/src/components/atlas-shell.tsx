@@ -9,7 +9,9 @@ import {
   Inbox,
   Network,
   Settings,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles,
+  TerminalSquare
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -50,41 +52,56 @@ export function AtlasShell({
   children
 }: AtlasShellProps): JSX.Element {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
-      <div className="mx-auto grid min-h-screen max-w-[1500px] lg:grid-cols-[260px_1fr]">
-        <aside className="border-b border-slate-200 bg-white/90 px-4 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90 lg:border-b-0 lg:border-r">
+    <div className="atlas-grid min-h-screen overflow-hidden bg-[var(--atlas-bg)] text-slate-100">
+      <div className="mx-auto grid min-h-screen max-w-[1720px] lg:grid-cols-[284px_1fr]">
+        <aside className="relative z-20 border-b border-white/10 bg-slate-950/78 px-4 py-4 backdrop-blur-2xl lg:border-b-0 lg:border-r lg:px-5">
           <div className="flex items-center justify-between gap-3 lg:block">
-            <Link className="flex items-center gap-3" href={`/org/${organizationSlug}`}>
-              <span className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-950 text-sm font-semibold text-white dark:bg-emerald-400 dark:text-slate-950">
+            <Link
+              className="atlas-focus group flex items-center gap-3 rounded-md"
+              href={`/org/${organizationSlug}`}
+            >
+              <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-cyan-300/25 bg-cyan-300 text-base font-black text-slate-950 shadow-[0_0_36px_rgb(34_211_238_/_0.24)] transition group-hover:scale-105">
                 A
               </span>
-              <span>
-                <span className="block text-sm font-semibold">Atlas</span>
-                <span className="block text-xs text-slate-500 dark:text-slate-400">
-                  {organizationSlug}
+              <span className="min-w-0">
+                <span className="block text-base font-semibold tracking-tight text-white">
+                  Atlas
                 </span>
+                <span className="block truncate text-xs text-slate-400">{organizationSlug}</span>
               </span>
             </Link>
             <Badge tone="success" className="lg:mt-5">
-              Live workspace
+              Evidence live
             </Badge>
+          </div>
+
+          <div className="mt-5 hidden rounded-lg border border-white/10 bg-white/[0.04] p-3 lg:block">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase text-slate-400">
+              <TerminalSquare className="h-4 w-4 text-cyan-200" aria-hidden="true" />
+              Engineering OS
+            </div>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              Repository evidence, memory, graph context, and reasoning in one launch surface.
+            </p>
           </div>
 
           <nav
             aria-label="Primary"
-            className="mt-5 flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0"
+            className="atlas-stagger mt-5 flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0"
           >
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
-                  className={cx(
-                    "inline-flex min-w-max items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100"
-                  )}
+                  className="atlas-focus group relative inline-flex min-w-max items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 transition hover:border-white/10 hover:bg-white/[0.06] hover:text-white lg:min-w-0"
                   href={`/org/${organizationSlug}${item.href}`}
                   key={item.label}
                 >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  <span className="absolute left-0 h-5 w-0.5 rounded-r-full bg-cyan-300 opacity-0 transition group-hover:opacity-100" />
+                  <Icon
+                    className="h-4 w-4 transition group-hover:text-cyan-200"
+                    aria-hidden="true"
+                  />
                   {item.label}
                 </Link>
               );
@@ -99,26 +116,29 @@ export function AtlasShell({
         </aside>
 
         <div className="min-w-0">
-          <header className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50/90 px-4 py-4 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90 sm:px-6">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <header className="sticky top-0 z-10 border-b border-white/10 bg-slate-950/72 px-4 py-4 backdrop-blur-2xl sm:px-6 lg:px-8">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase text-cyan-200">
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                   {eyebrow}
                 </p>
-                <h1 className="mt-1 text-2xl font-semibold tracking-normal text-slate-950 dark:text-slate-100">
+                <h1 className="mt-2 max-w-4xl text-3xl font-semibold tracking-normal text-white md:text-5xl">
                   {title}
                 </h1>
                 {description === undefined ? null : (
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-400">
+                  <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-400 md:text-base md:leading-7">
                     {description}
                   </p>
                 )}
               </div>
-              {actions}
+              {actions === undefined ? null : <div className="flex flex-wrap gap-2">{actions}</div>}
             </div>
           </header>
 
-          <main className="atlas-enter flex flex-col gap-5 px-4 py-5 sm:px-6">{children}</main>
+          <main className="atlas-enter flex flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+            {children}
+          </main>
         </div>
       </div>
     </div>
@@ -135,21 +155,19 @@ export function PageIntro({
   readonly facts: readonly string[];
 }): JSX.Element {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white px-4 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-      <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
+    <section className="atlas-panel-soft rounded-lg p-5">
+      <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
-          <p className="text-xs font-medium uppercase text-slate-500 dark:text-slate-400">
-            How to read this screen
-          </p>
-          <h2 className="mt-1 text-sm font-semibold text-slate-950 dark:text-slate-100">{title}</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-400">
+          <p className="text-xs font-semibold uppercase text-cyan-200">How Atlas knows</p>
+          <h2 className="mt-2 text-xl font-semibold tracking-normal text-white">{title}</h2>
+          <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-400 md:text-base md:leading-7">
             {body}
           </p>
         </div>
-        <div className="grid gap-2 sm:grid-cols-3 lg:min-w-[520px]">
+        <div className="grid gap-2 sm:grid-cols-3 lg:min-w-[540px]">
           {facts.map((fact) => (
             <div
-              className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+              className="rounded-md border border-cyan-300/15 bg-cyan-300/[0.06] px-3 py-2 text-xs font-semibold text-cyan-100"
               key={fact}
             >
               {fact}
@@ -171,16 +189,11 @@ export function TrustStrip({
   }[];
 }): JSX.Element {
   return (
-    <section className="grid gap-3 md:grid-cols-3">
+    <section className="atlas-stagger grid gap-3 md:grid-cols-3">
       {items.map((item) => (
-        <div
-          className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm dark:border-slate-800 dark:bg-slate-950"
-          key={item.label}
-        >
-          <p className="text-xs font-medium uppercase text-slate-500 dark:text-slate-400">
-            {item.label}
-          </p>
-          <Badge className="mt-2" tone={item.tone ?? "neutral"}>
+        <div className="atlas-panel-soft atlas-hover rounded-lg px-4 py-4" key={item.label}>
+          <p className="text-xs font-semibold uppercase text-slate-500">{item.label}</p>
+          <Badge className="mt-3" tone={item.tone ?? "neutral"}>
             {item.value}
           </Badge>
         </div>
@@ -220,12 +233,12 @@ export function DemoEmptyState({
   readonly action?: string;
 }): JSX.Element {
   return (
-    <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900/60">
-      <Icon className="h-5 w-5 text-slate-500 dark:text-slate-400" aria-hidden="true" />
-      <p className="mt-3 font-medium text-slate-950 dark:text-slate-100">{title}</p>
-      <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">{body}</p>
-      <p className="mt-3 rounded-md bg-white px-3 py-2 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-300">
-        <span className="font-medium text-slate-950 dark:text-slate-100">Next: </span>
+    <div className="rounded-lg border border-dashed border-slate-700 bg-slate-950/55 p-5">
+      <Icon className="h-5 w-5 text-cyan-200" aria-hidden="true" />
+      <p className="mt-4 text-base font-semibold text-white">{title}</p>
+      <p className="mt-2 text-sm leading-6 text-slate-400">{body}</p>
+      <p className="mt-4 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-300">
+        <span className="font-semibold text-white">Next: </span>
         {nextStep}
       </p>
       {href === undefined || action === undefined ? null : (
@@ -234,5 +247,29 @@ export function DemoEmptyState({
         </Button>
       )}
     </div>
+  );
+}
+
+export function EvidenceDisclosure({
+  title,
+  children,
+  className
+}: {
+  readonly title: string;
+  readonly children: ReactNode;
+  readonly className?: string;
+}): JSX.Element {
+  return (
+    <details
+      className={cx(
+        "atlas-disclosure rounded-md border border-white/10 bg-white/[0.035] p-3",
+        className
+      )}
+    >
+      <summary className="atlas-focus cursor-pointer text-sm font-semibold text-slate-100">
+        {title}
+      </summary>
+      <div className="mt-3">{children}</div>
+    </details>
   );
 }
