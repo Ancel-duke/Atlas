@@ -7,9 +7,9 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf dist",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint src/**/*.ts test/**/*.ts",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

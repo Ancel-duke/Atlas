@@ -2,8 +2,9 @@ import type { CanActivate, ExecutionContext } from "@nestjs/common";
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 
-import { roleHasPermission, type OrganizationPermission } from "@atlas/domain";
+import { permissionsForRole, roleHasPermission, type OrganizationPermission } from "@atlas/domain";
 
+import { PrismaService } from "../../../infrastructure/database/prisma.service.js";
 import { JwtVerifier } from "../application/jwt-verifier.js";
 import type { AuthenticatedRequest } from "./authenticated-request.js";
 import { isPublicRouteMetadataKey } from "./public.decorator.js";
@@ -13,7 +14,8 @@ import { requiredPermissionsMetadataKey } from "./require-permission.decorator.j
 export class JwtAuthGuard implements CanActivate {
   public constructor(
     private readonly reflector: Reflector,
-    private readonly jwtVerifier: JwtVerifier
+    private readonly jwtVerifier: JwtVerifier,
+    private readonly prisma: PrismaService
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -28,6 +30,7 @@ export class JwtAuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const principal = await this.jwtVerifier.verify(request.header("authorization"));
+    const activePrincipal = await this.activePrincipal(principal);
     const requiredPermissions = this.reflector.getAllAndOverride<OrganizationPermission[]>(
       requiredPermissionsMetadataKey,
       [context.getHandler(), context.getClass()]
@@ -35,7 +38,7 @@ export class JwtAuthGuard implements CanActivate {
 
     if (requiredPermissions !== undefined) {
       const isAuthorized = requiredPermissions.every((permission) =>
-        roleHasPermission(principal.role, permission)
+        roleHasPermission(activePrincipal.role, permission)
       );
 
       if (!isAuthorized) {
@@ -44,12 +47,35 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     Object.defineProperty(request, "principal", {
-      value: principal,
+      value: activePrincipal,
       enumerable: true,
       configurable: false,
       writable: false
     });
 
     return true;
+  }
+
+  private async activePrincipal(principal: AuthenticatedRequest["principal"]) {
+    const membership = await this.prisma.membership.findFirst({
+      where: {
+        userId: principal.userId,
+        organizationId: principal.organizationId,
+        status: "active"
+      },
+      include: { organization: true }
+    });
+
+    if (membership === null) {
+      throw new ForbiddenException("Current organization membership is not active.");
+    }
+
+    const role = membership.role;
+    return {
+      ...principal,
+      organizationSlug: membership.organization.slug,
+      role,
+      permissions: [...permissionsForRole(role)]
+    };
   }
 }

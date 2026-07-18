@@ -3,6 +3,16 @@ import { z } from "zod";
 const nodeEnvironmentSchema = z.enum(["development", "test", "production"]).default("development");
 
 const logLevelSchema = z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info");
+const commaSeparatedUrlsSchema = z
+  .string()
+  .default("http://localhost:3000")
+  .transform((value) =>
+    value
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0)
+  )
+  .pipe(z.array(z.string().url()).min(1));
 
 const serverEnvironmentSchema = z.object({
   NODE_ENV: nodeEnvironmentSchema,
@@ -16,6 +26,8 @@ const serverEnvironmentSchema = z.object({
   ATLAS_INTERNAL_API_SECRET: z.string().min(32),
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
+  ATLAS_WEB_ORIGINS: commaSeparatedUrlsSchema,
+  GITHUB_WEBHOOK_SECRET: z.string().min(16).optional(),
   OTEL_SERVICE_NAME: z.string().min(1).default("atlas")
 });
 

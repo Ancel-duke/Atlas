@@ -24,8 +24,9 @@ describe("organization authorization", () => {
   it("returns immutable permission collections by role", () => {
     expect(permissionsForRole("admin")).toContain("invitation:revoke");
     expect(permissionsForRole("admin")).toContain("graph:project");
-    expect(permissionsForRole("member")).toContain("memory:evidence");
     expect(permissionsForRole("member")).toContain("memory:correct");
+    expect(permissionsForRole("member")).not.toContain("graph:write");
+    expect(permissionsForRole("member")).not.toContain("repository:write");
     expect(permissionsForRole("member")).not.toContain("audit:read");
   });
 });
