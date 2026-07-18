@@ -8,9 +8,12 @@ import {
   createInvitationRequestSchema,
   createMemoryRecordRequestSchema,
   createOrganizationRequestSchema,
+  createReasoningRunRequestSchema,
+  createRepositoryRequestSchema,
   reviewCorrectionRequestSchema,
   switchOrganizationRequestSchema,
-  transitionMemoryLifecycleRequestSchema
+  transitionMemoryLifecycleRequestSchema,
+  updateRepositoryRequestSchema
 } from "@atlas/contracts";
 
 import { signIn, signOut, updateSession } from "../auth";
@@ -65,6 +68,53 @@ export async function createInvitationAction(formData: FormData): Promise<void> 
   const sdk = await createAuthenticatedAtlasSdk();
   await sdk.createInvitation(organizationId, request);
   redirect(`/org/${organizationSlug}/settings/members`);
+}
+
+export async function createRepositoryAction(formData: FormData): Promise<void> {
+  const organizationSlug = requiredFormValue(formData, "organizationSlug");
+  const request = createRepositoryRequestSchema.parse({
+    provider: "github",
+    providerRepositoryId: requiredFormValue(formData, "providerRepositoryId"),
+    name: requiredFormValue(formData, "name"),
+    defaultBranch: requiredFormValue(formData, "defaultBranch")
+  });
+  const sdk = await createAuthenticatedAtlasSdk();
+  const repository = await sdk.createRepository(request);
+  redirect(`/org/${organizationSlug}/repositories/${repository.id}/pulse`);
+}
+
+export async function updateRepositoryAction(formData: FormData): Promise<void> {
+  const organizationSlug = requiredFormValue(formData, "organizationSlug");
+  const repositoryId = requiredFormValue(formData, "repositoryId");
+  const request = updateRepositoryRequestSchema.parse({
+    name: requiredFormValue(formData, "name"),
+    defaultBranch: requiredFormValue(formData, "defaultBranch"),
+    connectionStatus: requiredFormValue(formData, "connectionStatus")
+  });
+  const sdk = await createAuthenticatedAtlasSdk();
+  await sdk.updateRepository(repositoryId, request);
+  redirect(`/org/${organizationSlug}/repositories/${repositoryId}/settings`);
+}
+
+export async function calculateRepositoryPulseAction(formData: FormData): Promise<void> {
+  const organizationSlug = requiredFormValue(formData, "organizationSlug");
+  const repositoryId = requiredFormValue(formData, "repositoryId");
+  const sdk = await createAuthenticatedAtlasSdk();
+  await sdk.calculateRepositoryPulse(repositoryId);
+  redirect(`/org/${organizationSlug}/repositories/${repositoryId}/pulse`);
+}
+
+export async function createReasoningRunAction(formData: FormData): Promise<void> {
+  const organizationSlug = requiredFormValue(formData, "organizationSlug");
+  const repositoryId = optionalFormValue(formData, "repositoryId");
+  const request = createReasoningRunRequestSchema.parse({
+    question: requiredFormValue(formData, "question"),
+    repositoryId,
+    memoryRecordIds: []
+  });
+  const sdk = await createAuthenticatedAtlasSdk();
+  await sdk.createReasoningRun(request);
+  redirect(`/org/${organizationSlug}/chat`);
 }
 
 function optionalFormValue(formData: FormData, key: string): string | null {

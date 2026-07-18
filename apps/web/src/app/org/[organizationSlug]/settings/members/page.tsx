@@ -4,6 +4,7 @@ import type { JSX } from "react";
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@atlas/ui";
 
+import { AtlasShell, PageIntro, TrustStrip } from "../../../../../components/atlas-shell";
 import { createAuthenticatedAtlasSdk, requireAtlasSession } from "../../../../../lib/atlas-api";
 import { createInvitationAction } from "../../../../actions";
 
@@ -28,18 +29,44 @@ export default async function MembersPage(props: MembersPageProps): Promise<JSX.
   ]);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-6 py-10">
-      <header className="flex items-center justify-between border-b border-slate-200 pb-5">
-        <div>
-          <p className="text-sm font-medium text-slate-500">Organization settings</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-normal text-slate-950">
-            Members and invitations
-          </h1>
-        </div>
+    <AtlasShell
+      organizationSlug={organizationSlug}
+      title="Members and invitations"
+      eyebrow="Organization settings"
+      description="Membership controls define who can create evidence, alter memory, run reasoning, and change repository settings."
+      actions={
         <Button asChild variant="secondary">
-          <Link href={`/org/${organizationSlug}`}>Back to organization</Link>
+          <Link href={`/org/${organizationSlug}`}>Dashboard</Link>
         </Button>
-      </header>
+      }
+    >
+      <PageIntro
+        title="Access control is part of trust."
+        body="Atlas treats organization membership as an engineering boundary. Roles determine which users can write graph facts, memory records, repository settings, and invitations."
+        facts={["Active members", "Scoped roles", "Invitation audit"]}
+      />
+
+      <TrustStrip
+        items={[
+          {
+            label: "Active members",
+            value: `${memberships.filter((membership) => membership.status === "active").length}/${memberships.length}`,
+            tone: memberships.length > 0 ? "success" : "warning"
+          },
+          {
+            label: "Pending invitations",
+            value: `${invitations.filter((invitation) => invitation.status === "pending").length}`,
+            tone: invitations.some((invitation) => invitation.status === "pending")
+              ? "info"
+              : "neutral"
+          },
+          {
+            label: "Your role",
+            value: atlasSession.principal.role,
+            tone: "info"
+          }
+        ]}
+      />
 
       <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <Card>
@@ -48,7 +75,7 @@ export default async function MembersPage(props: MembersPageProps): Promise<JSX.
           </CardHeader>
           <CardContent className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-200 text-slate-500">
+              <thead className="border-b border-slate-200 text-slate-500 dark:border-slate-800 dark:text-slate-400">
                 <tr>
                   <th className="py-2 font-medium">User</th>
                   <th className="py-2 font-medium">Role</th>
@@ -58,10 +85,17 @@ export default async function MembersPage(props: MembersPageProps): Promise<JSX.
               </thead>
               <tbody>
                 {memberships.map((membership) => (
-                  <tr key={membership.id} className="border-b border-slate-100">
+                  <tr
+                    key={membership.id}
+                    className="border-b border-slate-100 dark:border-slate-800"
+                  >
                     <td className="py-3">
-                      <p className="font-medium text-slate-950">{membership.email}</p>
-                      <p className="text-slate-500">{membership.name ?? "Unnamed user"}</p>
+                      <p className="font-medium text-slate-950 dark:text-slate-100">
+                        {membership.email}
+                      </p>
+                      <p className="text-slate-500 dark:text-slate-400">
+                        {membership.name ?? "Unnamed user"}
+                      </p>
                     </td>
                     <td className="py-3">{membership.role}</td>
                     <td className="py-3">{membership.status}</td>
@@ -85,18 +119,21 @@ export default async function MembersPage(props: MembersPageProps): Promise<JSX.
                 value={atlasSession.principal.organizationId}
               />
               <input name="organizationSlug" type="hidden" value={organizationSlug} />
-              <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+              <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                 Email
                 <input
                   required
                   name="email"
                   type="email"
-                  className="rounded-md border border-slate-300 px-3 py-2"
+                  className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                 />
               </label>
-              <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+              <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                 Role
-                <select name="role" className="rounded-md border border-slate-300 px-3 py-2">
+                <select
+                  name="role"
+                  className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-950 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                >
                   <option value="member">Member</option>
                   <option value="viewer">Viewer</option>
                   <option value="admin">Admin</option>
@@ -114,7 +151,7 @@ export default async function MembersPage(props: MembersPageProps): Promise<JSX.
         </CardHeader>
         <CardContent className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-200 text-slate-500">
+            <thead className="border-b border-slate-200 text-slate-500 dark:border-slate-800 dark:text-slate-400">
               <tr>
                 <th className="py-2 font-medium">Email</th>
                 <th className="py-2 font-medium">Role</th>
@@ -124,7 +161,7 @@ export default async function MembersPage(props: MembersPageProps): Promise<JSX.
             </thead>
             <tbody>
               {invitations.map((invitation) => (
-                <tr key={invitation.id} className="border-b border-slate-100">
+                <tr key={invitation.id} className="border-b border-slate-100 dark:border-slate-800">
                   <td className="py-3">{invitation.email}</td>
                   <td className="py-3">{invitation.role}</td>
                   <td className="py-3">{invitation.status}</td>
@@ -135,6 +172,6 @@ export default async function MembersPage(props: MembersPageProps): Promise<JSX.
           </table>
         </CardContent>
       </Card>
-    </main>
+    </AtlasShell>
   );
 }

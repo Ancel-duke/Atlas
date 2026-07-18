@@ -17,3 +17,47 @@ body {
 a {
   color: inherit;
 }
+
+::selection {
+  background: #99f6e4;
+  color: #042f2e;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #020617;
+    color: #e2e8f0;
+  }
+
+  ::selection {
+    background: #115e59;
+    color: #f8fafc;
+  }
+}
+
+@keyframes atlas-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.atlas-enter {
+  animation: atlas-enter 420ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
