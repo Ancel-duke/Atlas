@@ -99,6 +99,12 @@ export class IdentityService {
             avatarUrl: input.avatarUrl
           }
         });
+        await this.ensureDefaultOrganizationMembership(
+          existingAccount.userId,
+          input,
+          correlationId,
+          tx
+        );
 
         return tx.user.findUniqueOrThrow({
           where: { id: existingAccount.userId },
@@ -134,39 +140,7 @@ export class IdentityService {
         }
       });
 
-      const activeMembershipCount = await tx.membership.count({
-        where: { userId: userRecord.id, status: "active" }
-      });
-
-      if (activeMembershipCount === 0) {
-        const organization = await tx.organization.create({
-          data: {
-            slug: await this.uniqueOrganizationSlug(input.username ?? normalizedEmail, tx),
-            displayName: this.defaultOrganizationName(input.name, input.username, normalizedEmail)
-          }
-        });
-
-        await tx.membership.create({
-          data: {
-            organizationId: organization.id,
-            userId: userRecord.id,
-            role: "owner",
-            status: "active"
-          }
-        });
-
-        await tx.auditEvent.create({
-          data: {
-            organizationId: organization.id,
-            actorId: userRecord.id,
-            eventName: "identity.github_oauth_first_organization_created",
-            targetType: "organization",
-            targetId: organization.id,
-            correlationId,
-            metadata: { provider: "github" }
-          }
-        });
-      }
+      await this.ensureDefaultOrganizationMembership(userRecord.id, input, correlationId, tx);
 
       return tx.user.findUniqueOrThrow({
         where: { id: userRecord.id },
@@ -287,6 +261,50 @@ export class IdentityService {
     }
 
     throw new ForbiddenException("Unable to allocate a unique organization slug.");
+  }
+
+  private async ensureDefaultOrganizationMembership(
+    userId: string,
+    input: GitHubOAuthExchangeRequest,
+    correlationId: string,
+    tx: Pick<PrismaService, "auditEvent" | "membership" | "organization">
+  ): Promise<void> {
+    const activeMembershipCount = await tx.membership.count({
+      where: { userId, status: "active" }
+    });
+
+    if (activeMembershipCount > 0) {
+      return;
+    }
+
+    const normalizedEmail = input.email.toLowerCase();
+    const organization = await tx.organization.create({
+      data: {
+        slug: await this.uniqueOrganizationSlug(input.username ?? normalizedEmail, tx),
+        displayName: this.defaultOrganizationName(input.name, input.username, normalizedEmail)
+      }
+    });
+
+    await tx.membership.create({
+      data: {
+        organizationId: organization.id,
+        userId,
+        role: "owner",
+        status: "active"
+      }
+    });
+
+    await tx.auditEvent.create({
+      data: {
+        organizationId: organization.id,
+        actorId: userId,
+        eventName: "identity.github_oauth_first_organization_created",
+        targetType: "organization",
+        targetId: organization.id,
+        correlationId,
+        metadata: { provider: "github" }
+      }
+    });
   }
 
   private slugify(value: string): string {

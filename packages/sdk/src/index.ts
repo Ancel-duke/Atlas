@@ -447,13 +447,25 @@ export class AtlasSdk {
       requestInit.body = JSON.stringify(options.body);
     }
 
-    const response = await fetch(new URL(path, this.options.baseUrl), requestInit);
-    const body = await this.parseResponseBody(response);
+    const url = new URL(path, this.options.baseUrl);
+    const response = await fetch(url, requestInit);
+    const responseText = await response.text();
+    const body = this.parseResponseBody(response, responseText);
+    const parsedProblem = problemDetailsSchema.safeParse(body);
+
+    this.logResponse({
+      method,
+      url,
+      status: response.status,
+      responseBody: body,
+      problemDetails: parsedProblem.success ? parsedProblem.data : undefined
+    });
 
     if (!response.ok) {
-      const parsedProblem = problemDetailsSchema.safeParse(body);
       throw new AtlasSdkError(
-        parsedProblem.success ? parsedProblem.data.title : "Atlas API request failed.",
+        parsedProblem.success
+          ? this.problemMessage(parsedProblem.data)
+          : "Atlas API request failed.",
         response.status,
         parsedProblem.success ? parsedProblem.data : undefined
       );
@@ -462,8 +474,7 @@ export class AtlasSdk {
     return parse(body);
   }
 
-  private async parseResponseBody(response: Response): Promise<unknown> {
-    const text = await response.text();
+  private parseResponseBody(response: Response, text: string): unknown {
     if (text.trim().length === 0) {
       return null;
     }
@@ -473,6 +484,63 @@ export class AtlasSdk {
     } catch {
       throw new AtlasSdkError("Atlas API returned an invalid JSON response.", response.status);
     }
+  }
+
+  private logResponse({
+    method,
+    url,
+    status,
+    responseBody,
+    problemDetails
+  }: {
+    readonly method: string;
+    readonly url: URL;
+    readonly status: number;
+    readonly responseBody: unknown;
+    readonly problemDetails: ProblemDetails | undefined;
+  }): void {
+    const event = {
+      event: "atlas.sdk.response",
+      method,
+      url: url.toString(),
+      status,
+      responseBody: this.redactForLog(responseBody),
+      problemDetails
+    };
+    const message = JSON.stringify(event);
+
+    if (status >= 400) {
+      console.error(message);
+      return;
+    }
+
+    console.info(message);
+  }
+
+  private redactForLog(value: unknown): unknown {
+    if (Array.isArray(value)) {
+      return value.map((item) => this.redactForLog(item));
+    }
+
+    if (value === null || typeof value !== "object") {
+      return value;
+    }
+
+    const redacted: Record<string, unknown> = {};
+
+    for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+      redacted[key] = /authorization|secret|token/i.test(key)
+        ? "<redacted>"
+        : this.redactForLog(item);
+    }
+
+    return redacted;
+  }
+
+  private problemMessage(problem: ProblemDetails): string {
+    return problem.detail === undefined || problem.detail.length === 0
+      ? problem.title
+      : `${problem.title}: ${problem.detail}`;
   }
 }
 

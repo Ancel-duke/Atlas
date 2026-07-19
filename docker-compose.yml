@@ -64,7 +64,7 @@ services:
       DATABASE_URL: postgresql://atlas:atlas@postgres:5432/atlas?schema=public
       REDIS_URL: redis://redis:6379
     depends_on:
-      postgres:
+      api:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -94,7 +94,7 @@ services:
       - "3000:3000"
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
 
 volumes:
   atlas_postgres_data:
